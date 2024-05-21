@@ -25,8 +25,10 @@ db.reviews = require("./models/reviews.js")(db.sequelize, DataTypes);
 
 db.user.hasOne(db.shopping_cart)
 db.shopping_cart.belongsTo(db.user)
+
 db.shopping_cart.belongsToMany(db.products, { through: db.shopping_cart_products });
 db.products.belongsToMany(db.shopping_cart, { through: db.shopping_cart_products });
+
 db.reviews.belongsTo(db.products)
 db.reviews.belongsTo(db.user)
 
