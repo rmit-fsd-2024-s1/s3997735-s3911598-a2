@@ -1,0 +1,21 @@
+const { Description, Category } = require("@mui/icons-material");
+
+module.exports = (sequelize, DataTypes) =>
+  sequelize.define("shopping_cart_products", {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+  }, {
+    // Don't add the timestamp attributes (updatedAt, createdAt).
+    timestamps: false
+  }, {
+    tableName: 'shopping_cart_products' 
+  }, {
+    freezeTableName: true, 
+  });

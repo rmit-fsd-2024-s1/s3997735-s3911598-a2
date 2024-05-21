@@ -1,8 +1,15 @@
+const { all } = require("../../controllers/user.controller");
+
 module.exports = (sequelize, DataTypes) =>
   sequelize.define("user", {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     username: {
       type: DataTypes.STRING(32),
-      primaryKey: true
+      allowNull: false,
     },
     password_hash: {
       type: DataTypes.STRING(96),
