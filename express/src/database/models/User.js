@@ -1,12 +1,12 @@
 const { all } = require("../../controllers/user.controller");
 
 module.exports = (sequelize, DataTypes) =>
-  sequelize.define("user", {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
+    sequelize.define("user", {
+        id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+        },
         username: {
             type: DataTypes.STRING(32),
             allowNull: false,
@@ -33,5 +33,5 @@ module.exports = (sequelize, DataTypes) =>
     }, {
         // Add the timestamp attributes (updatedAt, createdAt).
         timestamps: true
-    });
-};
+    }
+);
