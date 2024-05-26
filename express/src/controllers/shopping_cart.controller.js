@@ -1,45 +1,99 @@
 const db = require("../database");
 const argon2 = require("argon2");
 
-// Select all users from the database.
+// Select all products with user_id
 exports.all = async (req, res) => {
+  console.log(req.body);
   const result = await db.shopping_cart.findAll(
     {
-      include: db.products
-    }
+      where: {
+        userId: req.body.user_id,
+      },
+      include: {
+        model: db.products,
+      },
+    },
+
   );
-
-  res.json(result);
+  // format the result passing to the front
+  const products = result[0].products.map(product => ({
+    id: product.shopping_cart_products.id,
+    product_id: product.id.toString(),
+    name: product.name,
+    price: product.price,
+    quantity: product.shopping_cart_products.quantity
+  }));
+  res.json(products);
 };
 
-// Select one user from the database.
-exports.one = async (req, res) => {
-  const user = await db.user.findByPk(req.params.id);
-
-  res.json(user);
-};
-
-// Select one user from the database if username and password are a match.
-exports.login = async (req, res) => {
-  const user = await db.user.findByPk(req.query.username);
-
-  if(user === null || await argon2.verify(user.password_hash, req.query.password) === false)
-    // Login failed.
-    res.json(null);
-  else
-    res.json(user);
-};
-
-// Create a user in the database.
-exports.create = async (req, res) => {
-  const hash = await argon2.hash(req.body.password, { type: argon2.argon2id });
-  
-  const user = await db.user.create({
-    username: req.body.username,
-    password_hash: hash,
-    first_name: req.body.firstname,
-    last_name: req.body.lastname
+exports.add = async (req, res) => {
+  console.log(req.body);
+  console.log(req.body.user_id);
+  let shopping_cart = await db.shopping_cart.findOne({
+    where: {
+      userId: req.body.user_id
+    }
   });
-
-  res.json(user);
+  if (shopping_cart === null) {
+    shopping_cart = await db.shopping_cart.create({
+      userId: req.body.user_id
+    });
+  }
+  const record = await db.shopping_cart_products.findOne({
+    where: {
+      productId: req.body.product_id,
+      shoppingCartId: shopping_cart.id
+    }
+  });
+  if (record !== null) {
+    res.status(400).json({ error: 'Product already exists in shopping cart' });
+    return;
+  }
+  const shopping_cart_product = await db.shopping_cart_products.create({
+    productId: req.body.product_id,
+    shoppingCartId: shopping_cart.id,
+    quantity: req.body.quantity
+  });
+  if (shopping_cart_product === null)
+    res.status(500).json({ error: 'Internal server error' });
+  else
+    res.json({ message: 'Product added to shopping cart successfully' });
 };
+
+exports.delete = async (req, res) => {
+  console.log("delete",req.query);
+  const shopping_cart_product = await db.shopping_cart_products.findByPk(req.query.id);
+  if (shopping_cart_product === null)
+    res.status(404).json({ error: 'Shopping cart product not found' });
+  else {
+    await shopping_cart_product.destroy();
+    res.json({ message: 'Shopping cart product deleted successfully' });
+  }
+}
+
+exports.update = async (req, res) => {
+  const shopping_cart_product = await db.shopping_cart_products.findOne({
+    where: {
+      id: req.body.id
+    }
+  });
+  if (shopping_cart_product === null)
+    res.status(404).json({ error: 'Shopping cart product not found' });
+  else {
+    shopping_cart_product.quantity = req.body.quantity;
+    await shopping_cart_product.save();
+    res.json({ message: 'Shopping cart product updated successfully' });
+  }
+}
+
+exports.deleteAll = async (req, res) => {
+  const shopping_cart = await db.shopping_cart.findByPk(req.query.user_id);
+
+  await db.shopping_cart_products.destroy({
+    where: {
+      shoppingCartId: shopping_cart.id
+    }
+  })
+  res.json({ message: 'All shopping cart products deleted successfully' });
+
+}

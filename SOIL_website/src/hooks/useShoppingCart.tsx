@@ -6,12 +6,12 @@ import {
     getTotalPrice,
     getCartItems
 } from '../data/repository';
-import { CartItem } from '../data/repository';
+import { CartItemModel } from '../data/repository';
 
 
 export const useShoppingCart = () => {
     
-        const addToCart = (product: CartItem) => {
+        const addToCart = (product: CartItemModel) => {
             addItem(product);
         };
     
@@ -31,10 +31,9 @@ export const useShoppingCart = () => {
             return getTotalPrice();
         };
 
-        const cartItems = (): CartItem[] => {
+        const cartItems = (): CartItemModel[] => {
             return getCartItems();
 
-          
 
 
         }

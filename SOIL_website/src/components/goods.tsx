@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { FaCartPlus } from 'react-icons/fa';
-import { isLoggedIn } from '../data/repository';
+import { User, getCurrentUser, isLoggedIn } from '../data/repository';
 import { useToast } from '@chakra-ui/react';
 import { useShoppingCart } from '../hooks/useShoppingCart';
+import axios from "axios";
+import { data } from 'autoprefixer';
+import { Category } from '@mui/icons-material';
 
 
 type Special = {
@@ -12,10 +15,13 @@ type Special = {
     name: string;
     price: number;
     originalPrice: number;
+    category?: string;
     imageUrl: string;
     validFrom: string;
-    validUntil: string;
+    validTo: string;
 };
+
+export type { Special };
 
 // Default specials data
 const defaultSpecials: Special[] = [
@@ -26,7 +32,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 3.99,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -36,7 +42,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 6.79,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -46,7 +52,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 8.95,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1424074560.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -56,7 +62,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 6.95,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1445482087.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -66,7 +72,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 7.95,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394873.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -76,7 +82,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 2.25,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444081936.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -86,7 +92,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 6.95,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394558.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -96,7 +102,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 8.95,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444188751.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -106,7 +112,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 5.25,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394588.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -116,7 +122,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 12.49,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394783.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -126,7 +132,7 @@ const defaultSpecials: Special[] = [
         originalPrice: 2.49,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394618.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
 
     {
@@ -136,13 +142,30 @@ const defaultSpecials: Special[] = [
         originalPrice: 12.49,
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388408648.jpg',
         validFrom: '2024-04-20',
-        validUntil: '2024-05-05',
+        validTo: '2024-05-05',
     },
-    
-];
 
-const Specials = () => {
+];
+interface GoodsProps {
+    category: string;
+}
+const Goods = ({ category }: GoodsProps) => {
     const [specials, setSpecials] = useState<Special[]>([]);
+    useEffect(() => {
+        refresh();
+    }, []);
+
+    const refresh = async () => {
+        // Using Axios with async.
+        try {
+            const result = await axios.post("http://localhost:4000/api/products", {
+                category: category
+            });
+            setSpecials((result.data) as Special[]);
+        } catch (e) {
+        } finally {
+        }
+    };
     // const { addItem } = useCart(); 
     const { addToCart } = useShoppingCart();
     const navigate = useNavigate();
@@ -154,24 +177,24 @@ const Specials = () => {
     );
 
 
-    useEffect(() => {
-        const savedSpecials = localStorage.getItem('specials');
-        if (savedSpecials) {
-            const specialsData: Special[] = JSON.parse(savedSpecials); //  data is typed as an array of Special
-            // check is newest data or not
-            if (specialsData && specialsData.length === defaultSpecials.length &&
-                specialsData.every((item: Special, index: number) => item.validUntil === defaultSpecials[index].validUntil)) {
-                setSpecials(specialsData);
-            } else {
-                // if not , update to the newest data.
-                localStorage.setItem('specials', JSON.stringify(defaultSpecials));
-                setSpecials(defaultSpecials);
-            }
-        } else {
-            localStorage.setItem('specials', JSON.stringify(defaultSpecials));
-            setSpecials(defaultSpecials);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const savedSpecials = localStorage.getItem('specials');
+    //     if (savedSpecials) {
+    //         const specialsData: Special[] = JSON.parse(savedSpecials); //  data is typed as an array of Special
+    //         // check is newest data or not
+    //         if (specialsData && specialsData.length === defaultSpecials.length &&
+    //             specialsData.every((item: Special, index: number) => item.validTo === defaultSpecials[index].validTo)) {
+    //             setSpecials(specialsData);
+    //         } else {
+    //             // if not , update to the newest data.
+    //             localStorage.setItem('specials', JSON.stringify(defaultSpecials));
+    //             setSpecials(defaultSpecials);
+    //         }
+    //     } else {
+    //         localStorage.setItem('specials', JSON.stringify(defaultSpecials));
+    //         setSpecials(defaultSpecials);
+    //     }
+    // }, []);
 
 
     // Format the date
@@ -194,7 +217,7 @@ const Specials = () => {
     const toast = useToast();
 
     // handle the change of shopping cart
-    const handleAddToCart = (special: Special) => {
+    const handleAddToCart = async (special: Special) => {
         // Check if user is logged in
         if (!isLoggedIn()) {
             toast({
@@ -206,23 +229,42 @@ const Specials = () => {
             navigate('/login');
             return;
         }
+
+        const user: User | null = getCurrentUser();
         const cartItem = {
             ...special,
             id: special.id.toString(),
-            quantity: quantities[special.id] 
+            quantity: quantities[special.id]
         };
-        addToCart(cartItem);
+        // addToCart(cartItem);
+        try {
+            var response = await axios.put('http://localhost:4000/api/shopping_cart/add',
+                {
+                    user_id: user?.id,
+                    product_id: special.id,
+                    quantity: quantities[special.id],
+                }
+            );
+            if (response.status === 400||response.status === 200) {
+                toast({
+                    title: 'Added to cart',
+                    status: 'success',
+                    duration: 1500,
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
         navigate('/shopping-cart');
     };
 
     return (
         <div className="specials-container mx-auto mt-4 p-4">
-            <h1 className="text-2xl font-bold text-center mb-6">Weekly Special</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {specials.map((special) => (
                     <div key={special.id} className="special-item border rounded-lg overflow-hidden shadow-md p-4">
                         <div className="w-full h-40 mb-4 flex justify-center items-center">
-                            <img src={special.imageUrl} alt={special.name} className="object-contain max-h-full mx-auto"/>
+                            <img src={special.imageUrl} alt={special.name} className="object-contain max-h-full mx-auto" />
                         </div>
                         <div className="text-left">
                             <h3 className="text-lg font-bold">{special.name}</h3>
@@ -230,16 +272,16 @@ const Specials = () => {
                             <p className="text-sm text-gray-500">Save
                                 ${(special.originalPrice - special.price).toFixed(2)} kg</p>
                             <p className="text-sm text-gray-600 mb-4">Offer
-                                valid {formatDate(special.validFrom)} - {formatDate(special.validUntil)}</p>
+                                valid {formatDate(special.validFrom)} - {formatDate(special.validTo)}</p>
                             <div className="flex items-center">
                                 <div className="flex border rounded overflow-hidden mr-2">
                                     <button onClick={() => handleQuantityChange(special.id, -1)}
-                                            className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
+                                        className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         -
                                     </button>
                                     <span className="px-3 py-1 bg-white text-gray-700">{quantities[special.id]}</span>
                                     <button onClick={() => handleQuantityChange(special.id, 1)}
-                                            className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
+                                        className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         +
                                     </button>
                                 </div>
@@ -247,7 +289,10 @@ const Specials = () => {
                                     onClick={() => handleAddToCart(special)}
                                     className="p-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded focus:outline-none focus:shadow-outline flex items-center justify-center"
                                 >
-                                    <FaCartPlus size={20}/>
+                                    <FaCartPlus size={20} />
+                                </button>
+                                <button onClick={() => {navigate(`/detail/${special.id}`);}} className='ml-auto'>
+                                    reviews
                                 </button>
                             </div>
                         </div>
@@ -259,7 +304,7 @@ const Specials = () => {
 
 };
 
-export default Specials;
+export default Goods;
 
 
 
