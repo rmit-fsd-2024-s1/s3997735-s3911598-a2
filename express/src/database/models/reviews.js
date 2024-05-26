@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) =>
       primaryKey: true
     },
     content: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(1000),
       allowNull: false
     },
     rating: {
@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) =>
     },
     isDeleted: {
       type: DataTypes.BOOLEAN,
-    }
+    },
+    parentId: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).
     timestamps: false

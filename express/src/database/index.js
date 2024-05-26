@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const config = require("./config.js");
+const { Category } = require("@mui/icons-material");
 
 const db = {
     Op: Sequelize.Op,
@@ -42,15 +43,18 @@ db.products.belongsToMany(db.shopping_cart, {
 db.reviews.belongsTo(db.products);
 db.reviews.belongsTo(db.user);
 
+db.reviews.belongsTo(db.user);
+db.reviews.belongsTo(db.products);
+
 // Learn more about associations here: https://sequelize.org/master/manual/assocs.html
 
 // Include a sync option with seed data logic included.
 db.sync = async () => {
     // Sync schema.
-    // await db.sequelize.sync();
+    await db.sequelize.sync();
 
     // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
-    await db.sequelize.sync({ force: true });
+    // await db.sequelize.sync({ force: true });
 
     await seedData();
 };
@@ -81,16 +85,18 @@ async function seedData() {
         last_name: "Kalra",
     });
     await db.products.create({
-        name: "Apple",
+        name: "organic Apple",
         price: 1.0,
         description: "A delicious apple",
-        image: "apple.jpg",
+        category: "special",
+        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
     });
     await db.products.create({
-        name: "Banana",
+        name: "organic Banana",
         price: 0.5,
+        category: "special",
         description: "A delicious banana",
-        image: "banana.jpg",
+        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
     });
     await db.shopping_cart.create({
         userId: 1,
@@ -110,6 +116,14 @@ async function seedData() {
         userId: 1,
         rating: 5,
         content: "Delicious!",
+        parentId: null,
+    });
+    await db.reviews.create({
+        productId: 1,
+        userId: 2,
+        rating: 3,
+        content: "Meh",
+        parentId: 1,
     });
     await db.reviews.create({
         productId: 2,

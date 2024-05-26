@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) =>
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true
     },
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).

@@ -1,9 +1,17 @@
+const { where } = require("sequelize");
 const db = require("../database");
 const argon2 = require("argon2");
 
 // Select all users from the database.
 exports.all = async (req, res) => {
-  const products = await db.products.findAll();
+  console.log(JSON.stringify(req.body));
+  const products = await db.products.findAll(
+    {
+      where: {
+        category: req.body.category
+      }
+    }
+  );
 
   res.json(products);
 };

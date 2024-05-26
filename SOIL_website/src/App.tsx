@@ -12,6 +12,8 @@ import Recipes from './pages/recipes';
 import ShoppingCart from './pages/ShoppingCart';
 import OrderSummary from './pages/OrderSummary';
 import CheckoutForm from "./components/CheckoutForm";
+import Detail from './pages/productDetail';
+import Products from './pages/products';
 
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/order-summary" element={<OrderSummary />} />
                             <Route path="/recipes" element={<Recipes />} />
+                            <Route path="/detail/:id" element={<Detail />} />
+                            <Route path="/products" element={<Products />} />
                         </Routes>
                     </div>
                     <hr />
