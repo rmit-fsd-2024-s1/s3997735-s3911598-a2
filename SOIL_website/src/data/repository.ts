@@ -27,7 +27,7 @@ function signup(name: string, email: string, password: string) {
   //use md5 to hash password
   const pwd = CryptoJs.MD5(password).toString();
   const user = {
-    id:1,
+    id:2,
     name,
     email,
     pwd,

@@ -22,130 +22,6 @@ type Special = {
 };
 
 export type { Special };
-
-// Default specials data
-const defaultSpecials: Special[] = [
-    {
-        id: 1,
-        name: 'organic Apple',
-        price: 2.99,
-        originalPrice: 3.99,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 2,
-        name: 'organic Bananas',
-        price: 3.79,
-        originalPrice: 6.79,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 3,
-        name: 'organic Blueberries',
-        price: 6.95,
-        originalPrice: 8.95,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1424074560.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 4,
-        name: 'organic Strawberries',
-        price: 5.95,
-        originalPrice: 6.95,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1445482087.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 5,
-        name: 'organic Grapes Green',
-        price: 5.95,
-        originalPrice: 7.95,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394873.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 6,
-        name: 'organic Avocados',
-        price: 1.25,
-        originalPrice: 2.25,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444081936.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 7,
-        name: 'organic Cabbage – Red Whole',
-        price: 5.95,
-        originalPrice: 6.95,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394558.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 8,
-        name: 'organic Chinese / Wombok',
-        price: 7.95,
-        originalPrice: 8.95,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444188751.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 9,
-        name: 'organic Capsicum Red',
-        price: 4.25,
-        originalPrice: 5.25,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394588.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 10,
-        name: 'Eggs – Free Range',
-        price: 9.99,
-        originalPrice: 12.49,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394783.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 11,
-        name: 'organic Carrots med',
-        price: 1.49,
-        originalPrice: 2.49,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394618.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-    {
-        id: 12,
-        name: 'organic Turmeric Fresh',
-        price: 9.49,
-        originalPrice: 12.49,
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388408648.jpg',
-        validFrom: '2024-04-20',
-        validTo: '2024-05-05',
-    },
-
-];
 interface GoodsProps {
     category: string;
 }
@@ -163,38 +39,13 @@ const Goods = ({ category }: GoodsProps) => {
             });
             setSpecials((result.data) as Special[]);
         } catch (e) {
-        } finally {
+            console.error(e);
         }
     };
     // const { addItem } = useCart(); 
     const { addToCart } = useShoppingCart();
     const navigate = useNavigate();
-    const [quantities, setQuantities] = useState<{ [key: number]: number }>(
-        defaultSpecials.reduce((acc, special) => {
-            acc[special.id] = 1; // inashouliz number to  1
-            return acc;
-        }, {} as { [key: number]: number }) // make sure key = { [key: number]: number }
-    );
-
-
-    // useEffect(() => {
-    //     const savedSpecials = localStorage.getItem('specials');
-    //     if (savedSpecials) {
-    //         const specialsData: Special[] = JSON.parse(savedSpecials); //  data is typed as an array of Special
-    //         // check is newest data or not
-    //         if (specialsData && specialsData.length === defaultSpecials.length &&
-    //             specialsData.every((item: Special, index: number) => item.validTo === defaultSpecials[index].validTo)) {
-    //             setSpecials(specialsData);
-    //         } else {
-    //             // if not , update to the newest data.
-    //             localStorage.setItem('specials', JSON.stringify(defaultSpecials));
-    //             setSpecials(defaultSpecials);
-    //         }
-    //     } else {
-    //         localStorage.setItem('specials', JSON.stringify(defaultSpecials));
-    //         setSpecials(defaultSpecials);
-    //     }
-    // }, []);
+    const [quantities, setQuantities] = useState<{ [key: number]: number }>([]);
 
 
     // Format the date
