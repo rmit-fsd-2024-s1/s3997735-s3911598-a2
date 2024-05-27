@@ -22,7 +22,6 @@ export default function Home() {
             {/* Content */}
             <div className="content-container p-24 border-t-2 border-gray-200">
                 <Specials category='special'/>
-                <GardeningTips />
             </div>
         </div>
     );
