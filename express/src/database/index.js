@@ -24,10 +24,7 @@ db.shopping_cart_products = require("./models/shopping_cart_products.js")(
 );
 db.reviews = require("./models/reviews.js")(db.sequelize, DataTypes);
 
-// Relate post and user.
-// db.post.belongsTo(db.user, {
-//   foreignKey: { name: "username", allowNull: false },
-// });
+
 
 db.user.hasOne(db.shopping_cart);
 db.shopping_cart.belongsTo(db.user);
@@ -69,7 +66,7 @@ async function seedData() {
         password_hash: hash,
         first_name: "Matthew",
         last_name: "Bolger",
-       
+
     });
     await db.products.create({
         name: "organic Apple",
@@ -92,7 +89,7 @@ async function seedData() {
         description: "A delicious organic Apple",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Bananas",
         price: 3.79,
@@ -100,7 +97,7 @@ async function seedData() {
         description: "A delicious organic Bananas",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Blueberries",
         price: 6.95,
@@ -108,7 +105,7 @@ async function seedData() {
         description: "A delicious organic Blueberries",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1424074560.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Strawberries",
         price: 5.95,
@@ -116,7 +113,7 @@ async function seedData() {
         description: "A delicious organic Strawberries",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1445482087.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Grapes Green",
         price: 5.95,
@@ -124,7 +121,7 @@ async function seedData() {
         description: "A delicious organic Grapes Green",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394873.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Avocados",
         price: 1.25,
@@ -132,7 +129,7 @@ async function seedData() {
         description: "A delicious organic Avocados",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444081936.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Cabbage – Red Whole",
         price: 5.95,
@@ -140,7 +137,7 @@ async function seedData() {
         description: "A delicious organic Cabbage – Red Whole",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394558.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Chinese / Wombok",
         price: 7.95,
@@ -148,7 +145,7 @@ async function seedData() {
         description: "A delicious organic Chinese / Wombok",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444188751.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Capsicum Red",
         price: 4.25,
@@ -156,7 +153,7 @@ async function seedData() {
         description: "A delicious organic Capsicum Red",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394588.jpg',
     });
-    
+
     await db.products.create({
         name: "Eggs – Free Range",
         price: 9.99,
@@ -164,7 +161,7 @@ async function seedData() {
         description: "A delicious Eggs – Free Range",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394783.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Carrots med",
         price: 1.49,
@@ -172,7 +169,7 @@ async function seedData() {
         description: "A delicious organic Carrots med",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394618.jpg',
     });
-    
+
     await db.products.create({
         name: "organic Turmeric Fresh",
         price: 9.49,
@@ -180,7 +177,7 @@ async function seedData() {
         description: "A delicious organic Turmeric Fresh",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388408648.jpg',
     });
-    
+
     await db.shopping_cart.create({
         userId: 1,
     });
