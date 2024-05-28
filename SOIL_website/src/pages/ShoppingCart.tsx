@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import CartItem from '../components/CartItem';
 import { useToast } from '@chakra-ui/react';
 import { useShoppingCart } from '../hooks/useShoppingCart';
+import { User, getCurrentUser } from '../data/repository';
+import axios from 'axios';
+import { CartItemModel } from '../data/repository';
 
 
 
@@ -17,26 +20,81 @@ const ShoppingCart = () => {
         cartTotalPrice,
     } = useShoppingCart();
     const toast = useToast();
+    const user: User | null = getCurrentUser();
+    console.log("user", user);
+    const [items, setItems] = React.useState<CartItemModel[]>([]);
 
-    const [items, setItems] = React.useState(cartItems());
-    const [totalPrice, setTotalPrice] = React.useState(cartTotalPrice());
+    const [totalPrice, setTotalPrice] = React.useState(0);
+    const fetchCartItems = async () => {
+        try {
+            const user_id = user?.id;
+            const response = await axios.post('http://localhost:4000/api/shopping_cart',
+                {
+                    user_id: user_id
+                }
+            );
+            setItems(response.data);
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
+    };
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
+    useEffect(() => {
+        const result = items.reduce((total, item) => total + item.price * item.quantity, 0);
+        setTotalPrice(result);
+    }, [items]);
 
-    const clearCart = () => {
-        emptyCart();
-        setItems([]);
-        setTotalPrice(0);
+
+    const clearCart = async () => {
+        // emptyCart();
+        // setItems([]);
+        // setTotalPrice(0);
+        try {
+            const user_id = user?.id;
+            const response = await axios.delete('http://localhost:4000/api/shopping_cart/deleteAll',
+                {
+                    params: { user_id: user_id }
+                }
+            );
+            fetchCartItems();
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
     }
 
-    const updateQuantity = (id: string, quantity: number) => {
-        changeQuantity(id, quantity);
-        setItems(cartItems());
-        setTotalPrice(cartTotalPrice());
+    const updateQuantity = async (id: string, quantity: number) => {
+        // changeQuantity(id, quantity);
+        // setItems(cartItems());
+        // setTotalPrice(cartTotalPrice());
+        try {
+            const response = await axios.post('http://localhost:4000/api/shopping_cart/update',
+                {
+                    id: id,
+                    quantity: quantity,
+
+                }
+            );
+            fetchCartItems();
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
     }
 
-    const removeItem = (id: string) => { 
-        removeFromCart(id);
-        setItems(cartItems());
-        setTotalPrice(cartTotalPrice());
+    const removeItem = async (id: string) => {
+        // removeFromCart(id);
+        // setItems(cartItems());
+        // setTotalPrice(cartTotalPrice());
+        console.log("id", id);
+        try {
+            const response = await axios.delete('http://localhost:4000/api/shopping_cart/delete',
+                { params: { id: id } }
+            );
+            fetchCartItems();
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
     }
 
 
@@ -48,10 +106,7 @@ const ShoppingCart = () => {
         navigate('/checkout');
     };
 
-    
-    if (items.length === 0) {
-        return <div>Your shopping cart is empty.</div>;
-    }
+
 
 
     return (
@@ -73,23 +128,26 @@ const ShoppingCart = () => {
                 ))}
             </div>
 
-            {items.length === 0 && (
-                <div className="text-center text-gray-500">Your cart is empty.</div>
+            {items.length === 0 ? <div className="text-center text-gray-500">Your cart is empty.</div> : (
+                <>
+
+                    <div className="flex justify-between items-center mt-8 font-bold text-xl">
+                        <span>Total Price:</span>
+                        <span>${totalPrice.toFixed(2)}</span>
+                    </div>
+
+                    <div className="flex justify-end space-x-4 mt-6">
+                        <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300" onClick={clearCart}>
+                            Clear Cart
+                        </button>
+                        <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300" onClick={handleCheckoutClick}>
+                            Checkout
+                        </button>
+                    </div>
+                </>
             )}
 
-            <div className="flex justify-between items-center mt-8 font-bold text-xl">
-                <span>Total Price:</span>
-                <span>${totalPrice.toFixed(2)}</span>
-            </div>
 
-            <div className="flex justify-end space-x-4 mt-6">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300" onClick={clearCart}>
-                    Clear Cart
-                </button>
-                <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300" onClick={handleCheckoutClick}>
-                    Checkout
-                </button>
-            </div>
         </div>
     );
 };

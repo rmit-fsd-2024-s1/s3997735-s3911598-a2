@@ -1,9 +1,10 @@
 import React from 'react';
-import { useShoppingCart } from '../hooks/useShoppingCart';
+import { Product } from '../models/Product';
 
 interface CartItemProps {
     item: {
         id: string;
+        product_id: string;
         name: string;
         price: number;
         quantity: number;
@@ -13,6 +14,7 @@ interface CartItemProps {
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item, onRemove, onUpdateQuantity }) => {
+
     return (
         <div className="flex  border-b p-4 gap-4">
             <div className="flex items-center flex-col justify-center w-1/4">

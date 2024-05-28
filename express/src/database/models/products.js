@@ -1,5 +1,3 @@
-
-
 module.exports = (sequelize, DataTypes) =>
   sequelize.define("products", {
     id: {
@@ -8,7 +6,7 @@ module.exports = (sequelize, DataTypes) =>
       primaryKey: true
     },
     name: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING(100),
       allowNull: false
     },
     description: {
@@ -19,18 +17,29 @@ module.exports = (sequelize, DataTypes) =>
       type: DataTypes.DOUBLE,
       allowNull: false
     },
-    Category: {
+    category: {
       type: DataTypes.STRING(20),
     },
-    isSpecial: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      }
+    originalPrice: {
+      type: DataTypes.DOUBLE,
+      allowNull: true
+    },
+    imageUrl: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    validFrom: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    validTo: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).
     timestamps: false
   }, {
-    tableName: 'products' // 明确指定表名
+    tableName: 'products'
   }
 );

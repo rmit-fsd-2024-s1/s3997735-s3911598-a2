@@ -1,5 +1,5 @@
 import React from 'react';
-import Specials from '../components/Specials';
+import Specials from '../components/goods';
 import GardeningTips from '../components/GardeningTips';
 
 export default function Home() {
@@ -21,8 +21,7 @@ export default function Home() {
 
             {/* Content */}
             <div className="content-container p-24 border-t-2 border-gray-200">
-                <Specials />
-                <GardeningTips />
+                <Specials category='special'/>
             </div>
         </div>
     );

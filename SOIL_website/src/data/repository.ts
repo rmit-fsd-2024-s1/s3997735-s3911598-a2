@@ -1,12 +1,13 @@
 import CryptoJs from 'crypto-js';
 import axios from "axios";
+import CartItem from '../components/CartItem';
 
-const API_HOST = "http://localhost:4000";
 const CURRENT_USER_KEY = "current_user";
 const USERS_KEY = "users";
 const CART_KEY = 'cartItems';
 
 interface User {
+  id: number;
   name: string;
   email: string;
   password: string;
@@ -16,6 +17,7 @@ interface User {
 
 interface CartItemModel {
   id: string;
+  product_id: string;
   name: string;
   price: number;
   quantity: number;
@@ -36,6 +38,7 @@ function signup(name: string, email: string, password: string) {
   //use md5 to hash password
   const pwd = CryptoJs.MD5(password).toString();
   const user = {
+    id:2,
     name,
     email,
     pwd,
@@ -199,9 +202,10 @@ const getCartItems = (): CartItemModel[] => {
 
 
 
-export type { User, CartItemModel as CartItem };
+export type { User, CartItemModel };
 
 export {
   signup, login, logout, getCurrentUser, deleteUser, UpdateUser, isLoggedIn,
-  addItem, removeItem, updateQuantity, clearCart, getTotalPrice, getCartItems,checkUserExists
+  addItem, removeItem, updateQuantity, clearCart, getTotalPrice, getCartItems, checkUserExists
 };
+

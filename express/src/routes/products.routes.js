@@ -3,7 +3,8 @@ module.exports = (express, app) => {
   const router = express.Router();
 
   // get all products.
-  router.get("/", controller.all);
+  router.post("/", controller.all);
+  router.post("/one", controller.one);
 
   // Add routes to server.
   app.use("/api/products", router);

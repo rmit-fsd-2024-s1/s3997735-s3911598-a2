@@ -32,6 +32,9 @@ export default function Header() {
                     <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/")}>
                         Home
                     </Button>
+                    <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/products")}>
+                        Products
+                    </Button>
                     <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/signup")}>
                         Sign Up
                     </Button>
@@ -42,6 +45,9 @@ export default function Header() {
                 <div className='flex text-center justify-end items-center gap-3'>
                     <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/")}>
                         Home
+                    </Button>
+                    <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/products")}>
+                        Products
                     </Button>
                     <Button className='flex-initial ' colorScheme='teal' variant='outline' onClick={e => navigate("/profile")}>
                         Profiles
