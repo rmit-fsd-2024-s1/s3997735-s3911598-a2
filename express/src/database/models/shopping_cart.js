@@ -1,4 +1,4 @@
-const { Description, Category } = require("@mui/icons-material");
+
 
 module.exports = (sequelize, DataTypes) =>
   sequelize.define("shopping_cart", {

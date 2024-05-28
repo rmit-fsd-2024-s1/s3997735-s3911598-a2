@@ -9,15 +9,15 @@ module.exports = (express, app) => {
     router.get("/select/:id", controller.one);
 
     // user signin
-    router.post("/login", controller.login);  // 将GET方法改为POST
+    router.post("/login", controller.login);  
 
     // create new user
-    router.post("/", controller.create);
+    router.post("/signup", controller.create);
 
     // update user
     router.put("/:id", controller.update);
 
-    // deletle user
+    // delete user
     router.delete("/:id", controller.delete);
 
     // Add routes to server.

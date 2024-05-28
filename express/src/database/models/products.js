@@ -1,4 +1,4 @@
-const { Description, Category } = require("@mui/icons-material");
+
 
 module.exports = (sequelize, DataTypes) =>
   sequelize.define("products", {
@@ -21,7 +21,12 @@ module.exports = (sequelize, DataTypes) =>
     },
     Category: {
       type: DataTypes.STRING(20),
-    }
+    },
+    isSpecial: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      }
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).
     timestamps: false

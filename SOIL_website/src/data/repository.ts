@@ -1,5 +1,7 @@
 import CryptoJs from 'crypto-js';
+import axios from "axios";
 
+const API_HOST = "http://localhost:4000";
 const CURRENT_USER_KEY = "current_user";
 const USERS_KEY = "users";
 const CART_KEY = 'cartItems';
@@ -17,6 +19,17 @@ interface CartItemModel {
   name: string;
   price: number;
   quantity: number;
+}
+
+async function verifyUser(email:string, password:string) {
+  const response = await axios.get(API_HOST + "/api/users/login", { params: { email, password } });
+  const user = response.data;
+
+  // NOTE: In this example the login is also persistent as it is stored in local storage.
+  if(user !== null)
+    // setUser(user);
+
+  return user;
 }
 
 function signup(name: string, email: string, password: string) {
@@ -155,12 +168,12 @@ const updateQuantity = (id: string, quantity: number) => {
   let prevItems: CartItemModel[] = JSON.parse(localStorage.getItem(CART_KEY + username) || '[]');
   //update the quantity of the item
   prevItems.map(item => {
-    if (item.id === id) {
-      item.quantity = quantity;
-      return item;
-    }
-    return item;
-  }
+        if (item.id === id) {
+          item.quantity = quantity;
+          return item;
+        }
+        return item;
+      }
   );
   localStorage.setItem(CART_KEY + username, JSON.stringify(prevItems));
 };
@@ -192,4 +205,3 @@ export {
   signup, login, logout, getCurrentUser, deleteUser, UpdateUser, isLoggedIn,
   addItem, removeItem, updateQuantity, clearCart, getTotalPrice, getCartItems,checkUserExists
 };
-

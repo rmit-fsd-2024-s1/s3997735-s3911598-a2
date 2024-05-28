@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const config = require("./config.js");
+const config = require("../database/config.js");
 
 const db = {
     Op: Sequelize.Op,
@@ -14,21 +14,11 @@ db.sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
 // Include models.
 db.user = require("./models/user.js")(db.sequelize, DataTypes);
 db.products = require("./models/products.js")(db.sequelize, DataTypes);
-db.shopping_cart = require("./models/shopping_cart.js")(
-    db.sequelize,
-    DataTypes
-);
-db.shopping_cart_products = require("./models/shopping_cart_products.js")(
-    db.sequelize,
-    DataTypes
-);
+db.shopping_cart = require("./models/shopping_cart.js")(db.sequelize, DataTypes);
+db.shopping_cart_products = require("./models/shopping_cart_products.js")(db.sequelize, DataTypes);
 db.reviews = require("./models/reviews.js")(db.sequelize, DataTypes);
 
-// Relate post and user.
-// db.post.belongsTo(db.user, {
-//   foreignKey: { name: "username", allowNull: false },
-// });
-
+// Relate models.
 db.user.hasOne(db.shopping_cart);
 db.shopping_cart.belongsTo(db.user);
 
@@ -42,16 +32,12 @@ db.products.belongsToMany(db.shopping_cart, {
 db.reviews.belongsTo(db.products);
 db.reviews.belongsTo(db.user);
 
-// Learn more about associations here: https://sequelize.org/master/manual/assocs.html
-
 // Include a sync option with seed data logic included.
 db.sync = async () => {
     // Sync schema.
-    // await db.sequelize.sync();
-
-    // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
-    await db.sequelize.sync({ force: true });
-
+    // await db.sequelize.sync({ alter: true });
+    await db.sequelize.sync();
+    // Seed data if necessary.
     await seedData();
 };
 
@@ -65,32 +51,26 @@ async function seedData() {
 
     let hash = await argon2.hash("abc123", { type: argon2.argon2id });
     await db.user.create({
-        username: "mbolger",
         email: "xxx.com",
         password_hash: hash,
         first_name: "Matthew",
         last_name: "Bolger",
+       
     });
 
-    hash = await argon2.hash("def456", { type: argon2.argon2id });
-    await db.user.create({
-        username: "shekhar",
-        email: "xxxx.com",
-        password_hash: hash,
-        first_name: "Shekhar",
-        last_name: "Kalra",
-    });
     await db.products.create({
         name: "Apple",
         price: 1.0,
         description: "A delicious apple",
         image: "apple.jpg",
+        isSpecial : true
     });
     await db.products.create({
         name: "Banana",
         price: 0.5,
         description: "A delicious banana",
         image: "banana.jpg",
+        isSpecial : false
     });
     await db.shopping_cart.create({
         userId: 1,
