@@ -1,5 +1,3 @@
-const { all } = require("../../controllers/user.controller");
-
 module.exports = (sequelize, DataTypes) =>
     sequelize.define("user", {
         id: {
