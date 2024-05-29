@@ -21,6 +21,8 @@ export default function Home() {
 
             {/* Content */}
             <div className="content-container p-24 border-t-2 border-gray-200">
+                <h2 className="text-3xl font-bold mb-8">Weekly Specials</h2>
+                <hr className="mb-8" />
                 <Specials category='special'/>
             </div>
         </div>
