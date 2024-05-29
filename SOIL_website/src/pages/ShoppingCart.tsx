@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
 import CartItem from '../components/CartItem';
 import { useToast } from '@chakra-ui/react';
-import { useShoppingCart } from '../hooks/useShoppingCart';
 import { User, getCurrentUser } from '../data/repository';
 import axios from 'axios';
 import { CartItemModel } from '../data/repository';
@@ -12,13 +10,6 @@ import { CartItemModel } from '../data/repository';
 
 const ShoppingCart = () => {
     const navigate = useNavigate();
-    const {
-        cartItems,
-        removeFromCart,
-        changeQuantity,
-        emptyCart,
-        cartTotalPrice,
-    } = useShoppingCart();
     const toast = useToast();
     const user: User | null = getCurrentUser();
     console.log("user", user);
@@ -48,9 +39,6 @@ const ShoppingCart = () => {
 
 
     const clearCart = async () => {
-        // emptyCart();
-        // setItems([]);
-        // setTotalPrice(0);
         try {
             const user_id = user?.id;
             const response = await axios.delete('http://localhost:4000/api/shopping_cart/deleteAll',
@@ -65,9 +53,6 @@ const ShoppingCart = () => {
     }
 
     const updateQuantity = async (id: string, quantity: number) => {
-        // changeQuantity(id, quantity);
-        // setItems(cartItems());
-        // setTotalPrice(cartTotalPrice());
         try {
             const response = await axios.post('http://localhost:4000/api/shopping_cart/update',
                 {
@@ -83,10 +68,6 @@ const ShoppingCart = () => {
     }
 
     const removeItem = async (id: string) => {
-        // removeFromCart(id);
-        // setItems(cartItems());
-        // setTotalPrice(cartTotalPrice());
-        console.log("id", id);
         try {
             const response = await axios.delete('http://localhost:4000/api/shopping_cart/delete',
                 { params: { id: id } }

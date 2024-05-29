@@ -78,22 +78,9 @@ async function seedData() {
     });
     await db.products.create({
         name: "organic Apple",
-        price: 1.0,
-        description: "A delicious apple",
-        category: "special",
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
-    });
-    await db.products.create({
-        name: "organic Banana",
-        price: 0.5,
-        category: "special",
-        description: "A delicious banana",
-        imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
-    });
-    await db.products.create({
-        name: "organic Apple",
         price: 2.99,
-        category: "standard",
+        category: "special",
+        originalPrice: 3.99,
         description: "A delicious organic Apple",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
     });
@@ -101,7 +88,8 @@ async function seedData() {
     await db.products.create({
         name: "organic Bananas",
         price: 3.79,
-        category: "standard",
+        category: "special",
+        originalPrice: 3.99,
         description: "A delicious organic Bananas",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
     });
@@ -133,7 +121,8 @@ async function seedData() {
     await db.products.create({
         name: "organic Avocados",
         price: 1.25,
-        category: "standard",
+        category: "special",
+        originalPrice: 3.99,
         description: "A delicious organic Avocados",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444081936.jpg',
     });
@@ -173,7 +162,8 @@ async function seedData() {
     await db.products.create({
         name: "organic Carrots med",
         price: 1.49,
-        category: "standard",
+        category: "special",
+        originalPrice: 3.99,
         description: "A delicious organic Carrots med",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394618.jpg',
     });
@@ -181,7 +171,8 @@ async function seedData() {
     await db.products.create({
         name: "organic Turmeric Fresh",
         price: 9.49,
-        category: "standard",
+        category: "special",
+        originalPrice: 13.99,
         description: "A delicious organic Turmeric Fresh",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388408648.jpg',
     });

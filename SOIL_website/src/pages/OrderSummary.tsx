@@ -1,5 +1,7 @@
 import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User, getCurrentUser } from '../data/repository';
+import axios from 'axios';
 
 interface CartItem {
     id: string;
@@ -15,6 +17,7 @@ interface PaymentInfo {
 
 const OrderSummary = () => {
     const navigate = useNavigate();
+    const user: User | null = getCurrentUser();
 
     // get the order summary from localStorage 
     const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cartItems') || '[]');
@@ -36,10 +39,20 @@ const OrderSummary = () => {
     // calculate the total price
     const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
-    const handleContinueShopping = () => {
+    const handleContinueShopping = async () => {
         // clear localStorage 
         localStorage.removeItem('cartItems');
         localStorage.removeItem('paymentInfo');
+        try {
+            const user_id = user?.id;
+            const response = await axios.delete('http://localhost:4000/api/shopping_cart/deleteAll',
+                {
+                    params: { user_id: user_id }
+                }
+            );
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
         navigate('/'); // nav to home page
     };
 
