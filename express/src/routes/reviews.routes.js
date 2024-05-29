@@ -7,6 +7,7 @@ module.exports = (express, app) => {
   router.put("/add", controller.add);
   router.post("/update", controller.update);
   router.delete("/delete", controller.delete);
+  router.get("/getTotalRating", controller.getTotalRating);
 
   // Add routes to server.
   app.use("/api/reviews", router);

@@ -71,6 +71,7 @@ async function startApolloServer(typeDefs, resolvers) {
   require("./src/routes/products.routes.js")(express, app);
   require("./src/routes/shopping_cart.routes.js")(express, app);
   require("./src/routes/reviews.routes.js")(express, app);
+  require("./src/routes/follows.routes.js")(express, app);
 
   // Set port, listen for requests.
   const PORT = process.env.PORT || 4000;

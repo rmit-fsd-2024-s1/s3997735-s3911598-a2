@@ -14,7 +14,8 @@ exports.all = async (req, res) => {
                 r.parentId, 
                 0 AS level, 
                 CONCAT(u.first_name, ' ', u.last_name) AS author,
-                u.id as userId
+                u.id as userId,
+                DATE_FORMAT(r.createdAt, '%Y-%m-%d %H:%i:%s') as createdAt
             FROM reviews r
             JOIN users u ON r.userId = u.id
             WHERE r.productId = :productId 
@@ -27,13 +28,14 @@ exports.all = async (req, res) => {
                 c.parentId, 
                 ct.level + 1, 
                 CONCAT(u.first_name, ' ', u.last_name) AS author,
-                c.userId
+                c.userId,
+                c.createdAt
             FROM reviews c
             JOIN users u ON c.userId = u.id
             INNER JOIN comment_tree ct ON c.parentId = ct.id
         )
         SELECT * FROM comment_tree
-        ORDER BY level`, {
+        ORDER BY level, createdAt`, {
             type: QueryTypes.SELECT,
             replacements: { productId: req.body.product_id },
         });
@@ -86,6 +88,18 @@ exports.delete = async (req, res) => {
 
         await review.destroy();
         res.json({ message: 'Review deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+exports.getTotalRating = async (req, res) => {
+    try {
+        const totalRating = await db.sequelize.query(`SELECT AVG(rating) as totalRating FROM reviews WHERE productId = :productId`, {
+            type: QueryTypes.SELECT,
+            replacements: { productId: req.query.product_id },
+        });
+        res.json(totalRating);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

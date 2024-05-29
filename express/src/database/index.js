@@ -23,6 +23,7 @@ db.shopping_cart_products = require("./models/shopping_cart_products.js")(
     DataTypes
 );
 db.reviews = require("./models/reviews.js")(db.sequelize, DataTypes);
+db.follows = require("./models/follows.js")(db.sequelize, DataTypes);
 
 
 

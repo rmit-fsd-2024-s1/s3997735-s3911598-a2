@@ -27,6 +27,7 @@ interface GoodsProps {
 }
 const Goods = ({ category }: GoodsProps) => {
     const [specials, setSpecials] = useState<Special[]>([]);
+    const user: User | null = getCurrentUser();
     useEffect(() => {
         refresh();
     }, []);
@@ -60,7 +61,7 @@ const Goods = ({ category }: GoodsProps) => {
     // handle the quantity change
     const handleQuantityChange = (id: number, delta: number) => {
         setQuantities((prevQuantities) => {
-            const newQuantity = (prevQuantities[id] || 0) + delta;
+            const newQuantity = (prevQuantities[id] || 1) + delta;
             return { ...prevQuantities, [id]: newQuantity < 1 ? 1 : newQuantity }; // start with  1
         });
     };
@@ -81,19 +82,12 @@ const Goods = ({ category }: GoodsProps) => {
             return;
         }
 
-        const user: User | null = getCurrentUser();
-        const cartItem = {
-            ...special,
-            id: special.id.toString(),
-            quantity: quantities[special.id]
-        };
-        // addToCart(cartItem);
         try {
             var response = await axios.put('http://localhost:4000/api/shopping_cart/add',
                 {
                     user_id: user?.id,
                     product_id: special.id,
-                    quantity: quantities[special.id],
+                    quantity: quantities[special.id]?quantities[special.id]:1,
                 }
             );
             if (response.status === 400||response.status === 200) {
@@ -130,7 +124,7 @@ const Goods = ({ category }: GoodsProps) => {
                                         className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         -
                                     </button>
-                                    <span className="px-3 py-1 bg-white text-gray-700">{quantities[special.id]}</span>
+                                    <span className="px-3 py-1 bg-white text-gray-700">{quantities[special.id]?quantities[special.id]:1}</span>
                                     <button onClick={() => handleQuantityChange(special.id, 1)}
                                         className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         +
@@ -142,9 +136,9 @@ const Goods = ({ category }: GoodsProps) => {
                                 >
                                     <FaCartPlus size={20} />
                                 </button>
-                                <button onClick={() => {navigate(`/detail/${special.id}`);}} className='ml-auto'>
+                                {user && <button onClick={() => {navigate(`/detail/${special.id}`);}} className='ml-auto'>
                                     reviews
-                                </button>
+                                </button>}
                             </div>
                         </div>
                     </div>
