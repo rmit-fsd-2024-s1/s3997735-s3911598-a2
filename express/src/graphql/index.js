@@ -1,12 +1,13 @@
 const { gql } = require("apollo-server-express");
 const { PubSub } = require("graphql-subscriptions");
 const db = require("../database");
-const {user: User, Product, Review} = require("../database");
+// const {user: User, Product, Review} = require("../database");
 
 // Create and track a GraphQL PubSub.
 const pubsub = new PubSub();
 
 const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
+const REVIEW_FLAGGED_TRIGGER = "REVIEW_FLAGGED";
 
 //Schema
 const typeDefs = gql`
@@ -34,6 +35,7 @@ const typeDefs = gql`
     user: User!
     product: Product!
     isDeleted: Boolean!
+    flagged: Boolean!
   }
   
   input ProductInput {
@@ -52,6 +54,7 @@ const typeDefs = gql`
     users: [User!]!
     products: [Product!]!
     reviews: [Review!]!
+    flaggedReviews: [Review!]!
   }
 
   # Mutation (modify data in the underlying data-source, ---database)
@@ -62,23 +65,68 @@ const typeDefs = gql`
     deleteProduct(id: ID!): Product!
     deleteReview(id: ID!): Review!
     addReview(content: String!, userId: ID!, productId: ID!): Review!
+    flagReview(id: ID!): Review!
   }
 
   type Subscription {
     reviewAdded: Review!
+    reviewFlagged: Review!
   }
 `;
 
-//Resolvers
+// Function to check if a review should be flaggged
+const shouldFlagReview = (content) => {
+    const offensiveLanguage = ["trash", "idiots",];
+    const spamPatterns = [/http:\/\/\S+/i, /https:\/\/\S+/i, /www\.\S+/i];
+    const irrelevantContent = ["The weather is great today"];
+    const privacyViolations = [/address is \d+ \S+/i];
+    const obsceneOrViolentContent = ["Fuck", "smash it"];
+
+    for (let word of offensiveLanguage) {
+        if (content.includes(word)) return true;
+    }
+
+    for (let pattern of spamPatterns) {
+        if (pattern.test(content)) return true;
+    }
+
+    for (let word of irrelevantContent) {
+        if (content.includes(word)) return true;
+    }
+
+    for (let pattern of privacyViolations) {
+        if (pattern.test(content)) return true;
+    }
+
+    for (let word of obsceneOrViolentContent) {
+        if (content.includes(word)) return true;
+    }
+
+    return false;
+};
+
+
+//Define the resolvers for the schema
 const resolvers = {
     // Queries
     Query: {
-        users: () => User.findAll(),
-        products: () => Product.findAll(),
-        reviews: () => Review.findAll({
+        users:async () => await db.user.findAll(),
+        // Fetch all users
+        products: () => db.products.findAll(), 
+        // Fetch all product
+        reviews: async () => {
+            return await db.reviews.findAll({
+                where: { isDeleted: false },
+                include: [
+                    { model: db.user, as: 'user' },
+                    { model: db.products, as: 'product' }
+                ]
+            });
+        },// Fetch all non-deleted reviews
+        flaggedReviews: () => Review.findAll({
             include: [User, Product],
-            where: { isDeleted: false },
-        }),
+            where: { flagged: true, isDeleted: false },
+        }) // Fetch all flagged and non_deleted reviews
     },
     // Mutations
     Mutation: {
@@ -89,29 +137,15 @@ const resolvers = {
             //pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: user}); // review controller
             return user;
         },
-        addProduct: (_, { input }) => Product.create({
-            name: input.name,
-            description: input.description,
-            price: input.price,
-            category: input.category,
-            originalPrice: input.originalPrice,
-            imageUrl: input.imageUrl,
-            validFrom: input.validFrom,
-            validTo: input.validTo
-        }),
+        addProduct: (_, { input }) => Product.create(input), // Create a new product
+        
         updateProduct: async (_, { id, input }) => {
             const product = await Product.findByPk(id);
-            if (input.name) product.name = input.name;
-            if (input.description) product.description = input.description;
-            if (input.price) product.price = input.price;
-            if (input.category) product.category = input.category;
-            if (input.originalPrice !== undefined) product.originalPrice = input.originalPrice;
-            if (input.imageUrl !== undefined) product.imageUrl = input.imageUrl;
-            if (input.validFrom !== undefined) product.validFrom = input.validFrom;
-            if (input.validTo !== undefined) product.validTo = input.validTo;
-            await product.save();
-            return product;
+            return product.update(input); // Update an existing product
         },
+        
+        
+        
         deleteProduct: async (_, { id }) => {
             const product = await Product.findByPk(id);
             await product.destroy();
@@ -122,16 +156,23 @@ const resolvers = {
             const review = await Review.findByPk(id);
             review.isDeleted = true;
             await review.save();
-            pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+            await pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
             return review;
         },
         addReview: async (_, { content, userId, productId }) => {
-            const user = await User.findByPk(userId);
-            if (user.isBlocked) {
-                throw new Error('User is blocked and cannot add reviews');
+            const flagged = shouldFlagReview(content); // Check if the review should be flagged
+            const review = await Review.create({ content, userId, productId, flagged });
+            pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review }); // Publish the review addition event
+            if (flagged) {
+                pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review }); // Publish the review flagged event if flagged
             }
-            const review = await Review.create({ content, userId, productId });
-            pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+            return review;
+        },
+        flagReview: async (_, { id }) => {
+            const review = await Review.findByPk(id);
+            review.flagged = true;
+            await review.save();
+            pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review }); // Publish the review flagged event
             return review;
         }
     },
@@ -139,11 +180,15 @@ const resolvers = {
         reviewAdded: {
             subscribe: () => pubsub.asyncIterator(REVIEW_ADDED_TRIGGER),
         },
-    },
+        reviewFlagged: {
+            subscribe: () => pubsub.asyncIterator(REVIEW_FLAGGED_TRIGGER),
+        }
+    }
 };
 
 module.exports = {
-    typeDefs, resolvers
+    typeDefs, 
+    resolvers
 };
 
 

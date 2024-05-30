@@ -2,7 +2,8 @@ const db = require("../database");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const { QueryTypes } = require("sequelize");
-
+const { PubSub } = require("graphql-subscriptions");
+const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
 exports.all = async (req, res) => {
     try {
         console.log(JSON.stringify(req.body));
@@ -55,8 +56,13 @@ exports.add = async (req, res) => {
             parentId: req.body.parent_id,
             rating: req.body.rating
         });
-        
+
         res.json(review);
+        
+        
+        
+        //pubsub to notify the socket....
+        await pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
     } catch (error) {
         res.status(500).json({ error: JSON.stringify(error) });
     }
