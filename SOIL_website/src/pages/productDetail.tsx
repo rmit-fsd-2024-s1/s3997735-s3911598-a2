@@ -18,6 +18,10 @@ export default function ProductDetail() {
             const result = await axios.get("http://localhost:4000/api/reviews/getTotalRating", {
                 params: { product_id: id }
             });
+            if (result.data[0].totalRating === null) {
+                setRating(0);
+                return;
+            }
             var rating = result.data[0].totalRating as string;
             console.log(result.data[0].totalRating);
             setRating(parseFloat(rating));

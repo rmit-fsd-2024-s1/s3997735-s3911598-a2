@@ -81,6 +81,7 @@ export default function Comment({ product_id }: CommentProps) {
     }
     useEffect(() => {
         getReviews(product_id);
+        checkFollow();
     }, []);
 
     const sendReview = async (parent_id: string | null, rating: number, content: string) => {
