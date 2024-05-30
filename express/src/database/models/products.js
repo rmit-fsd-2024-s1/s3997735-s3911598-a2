@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) =>
       type: DataTypes.STRING(100),
       allowNull: true
     },
+    
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).
     timestamps: false

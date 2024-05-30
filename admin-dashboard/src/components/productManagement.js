@@ -1,35 +1,50 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
+import { Form, Button, ListGroup, ListGroupItem, Spinner, Container } from 'react-bootstrap';
 
 const GET_PRODUCTS = gql`
   query GetProducts {
     products {
       id
       name
+      description
       price
-      isSpecial
+      category
+      originalPrice
+      imageUrl
+      validFrom
+      validTo
     }
   }
 `;
 
 const ADD_PRODUCT = gql`
-  mutation AddProduct($name: String!, $price: Float!, $isSpecial: Boolean!) {
-    addProduct(name: $name, price: $price, isSpecial: $isSpecial) {
+  mutation AddProduct($input: ProductInput!) {
+    addProduct(input: $input) {
       id
       name
+      description
       price
-      isSpecial
+      category
+      originalPrice
+      imageUrl
+      validForm
+      validTo
     }
   }
 `;
 
 const UPDATE_PRODUCT = gql`
-  mutation UpdateProduct($id: ID!, $name: String, $price: Float, $isSpecial: Boolean) {
-    updateProduct(id: $id, name: $name, price: $price, isSpecial: $isSpecial) {
+  mutation UpdateProduct($id: ID!, $input: ProductInput!) {
+    updateProduct(id: $id, input: $input) {
       id
       name
       price
-      isSpecial
+      category
+      originalPrice
+      imageUrl
+      validForm
+      validTo
     }
   }
 `;
@@ -47,18 +62,36 @@ const ProductManagement = () => {
     const [addProduct] = useMutation(ADD_PRODUCT);
     const [updateProduct] = useMutation(UPDATE_PRODUCT);
     const [deleteProduct] = useMutation(DELETE_PRODUCT);
-    const [newProduct, setNewProduct] = useState({ name: '', price: 0, isSpecial: false });
+    const [newProduct, setNewProduct] = useState({ 
+        name: '', 
+        description:'',
+        price: 0, 
+        category: 'standard',
+        originalPrice:0,
+        imageUrl:'',
+        validForm:'',
+        validTo:''
+    });
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error.message}</p>;
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <p className="text-danger">Error: {error.message}</p>;
 
     const handleAddProduct = () => {
-        addProduct({ variables: { ...newProduct } });
-        setNewProduct({ name: '', price: 0, isSpecial: false });
+        addProduct({ variables: { input: newProduct } });
+        setNewProduct({
+            name: '',
+            description: '',
+            price: 0,
+            category: 'standard',
+            originalPrice: 0,
+            imageUrl: '',
+            validFrom: '',
+            validTo: ''
+        });
     };
 
-    const handleUpdateProduct = (id, name, price, isSpecial) => {
-        updateProduct({ variables: { id, name, price, isSpecial } });
+    const handleUpdateProduct = (id, name, description, price, category, originalPrice, imageUrl, validFrom, validTo) => {
+        updateProduct({ variables: { id, input: { name, description, price, category, originalPrice, imageUrl, validFrom, validTo } } });
     };
 
     const handleDeleteProduct = (id) => {
@@ -66,43 +99,103 @@ const ProductManagement = () => {
     };
 
     return (
-        <div>
-            <h2>Product Management</h2>
-            <div>
-                <input
-                    type="text"
-                    value={newProduct.name}
-                    onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                    placeholder="Product Name"
-                />
-                <input
-                    type="number"
-                    value={newProduct.price}
-                    onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
-                    placeholder="Product Price"
-                />
-                <label>
-                    Special:
-                    <input
-                        type="checkbox"
-                        checked={newProduct.isSpecial}
-                        onChange={(e) => setNewProduct({ ...newProduct, isSpecial: e.target.checked })}
+        <Container>
+            <h2 className="mb-4">Product Management</h2>
+            <Form className="mb-4">
+                <Form.Group>
+                    <Form.Label>Product Name</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={newProduct.name}
+                        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                        placeholder="Product Name"
                     />
-                </label>
-                <button onClick={handleAddProduct}>Add Product</button>
-            </div>
-            <ul>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={newProduct.description}
+                        onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                        placeholder="Description"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Product Price</Form.Label>
+                    <Form.Control
+                        type="number"
+                        value={newProduct.price}
+                        onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
+                        placeholder="Product Price"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Category</Form.Label>
+                    <Form.Control
+                        as="select"
+                        value={newProduct.category}
+                        onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                    >
+                        <option value="standard">Standard</option>
+                        <option value="special">Special</option>
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Original Price</Form.Label>
+                    <Form.Control
+                        type="number"
+                        value={newProduct.originalPrice}
+                        onChange={(e) => setNewProduct({ ...newProduct, originalPrice: parseFloat(e.target.value) })}
+                        placeholder="Original Price"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Image URL</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={newProduct.imageUrl}
+                        onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                        placeholder="Image URL"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Valid From</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={newProduct.validFrom}
+                        onChange={(e) => setNewProduct({ ...newProduct, validFrom: e.target.value })}
+                        placeholder="Valid From"
+                    />
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Valid To</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={newProduct.validTo}
+                        onChange={(e) => setNewProduct({ ...newProduct, validTo: e.target.value })}
+                        placeholder="Valid To"
+                    />
+                </Form.Group>
+                <Button variant="primary" onClick={handleAddProduct}>Add Product</Button>
+            </Form>
+            <ListGroup>
                 {data.products.map((product) => (
-                    <li key={product.id}>
-                        {product.name} - ${product.price} - {product.isSpecial ? 'Special' : 'Standard'}
-                        <button onClick={() => handleUpdateProduct(product.id, product.name, product.price, !product.isSpecial)}>
-                            Toggle Special
-                        </button>
-                        <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
-                    </li>
+                    <ListGroupItem key={product.id} className="d-flex justify-content-between align-items-center">
+                        <span>{product.name} - ${product.price} - {product.category}</span>
+                        <div>
+                            <Button
+                                variant="info"
+                                className="mr-2"
+                                onClick={() => handleUpdateProduct(product.id, product.name, product.description, product.price, product.category, product.originalPrice, product.imageUrl, product.validFrom, product.validTo)}
+                            >
+                                Update
+                            </Button>
+                            <Button variant="danger" onClick={() => handleDeleteProduct(product.id)}>Delete</Button>
+                        </div>
+                    </ListGroupItem>
                 ))}
-            </ul>
-        </div>
+            </ListGroup>
+        </Container>
     );
 };
 

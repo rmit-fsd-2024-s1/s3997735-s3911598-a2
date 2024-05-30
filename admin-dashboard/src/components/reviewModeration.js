@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation, gql, useSubscription } from '@apollo/client';
+import { ListGroup, ListGroupItem, Button, Spinner, Container } from 'react-bootstrap';
 
 const GET_REVIEWS = gql`
   query GetReviews {
@@ -61,8 +62,8 @@ const ReviewModeration = () => {
         }
     }, [subscriptionData]);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error.message}</p>;
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <p className="text-danger">Error: {error.message}</p>;
 
     const handleDelete = (id) => {
         deleteReview({ variables: { id } });
@@ -70,21 +71,25 @@ const ReviewModeration = () => {
     };
 
     return (
-        <div>
-            <h2>Review Moderation</h2>
-            <ul>
+        <Container>
+            <h2 className="mb-4">Review Moderation</h2>
+            <ListGroup>
                 {reviews.map((review) => (
-                    <li key={review.id}>
-                        {review.isDeleted ? (
-                            <p>[**** This review has been deleted by the admin ***]</p>
-                        ) : (
-                            <p>{review.content} - {review.user.username} - {review.product.name}</p>
+                    <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
+                        <span>
+                            {review.isDeleted ? (
+                                <em className="text-muted">[**** This review has been deleted by the admin ***]</em>
+                            ) : (
+                                <span>{review.content} - {review.user.username} - {review.product.name}</span>
+                            )}
+                        </span>
+                        {!review.isDeleted && (
+                            <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>
                         )}
-                        <button onClick={() => handleDelete(review.id)}>Delete</button>
-                    </li>
+                    </ListGroupItem>
                 ))}
-            </ul>
-        </div>
+            </ListGroup>
+        </Container>
     );
 };
 

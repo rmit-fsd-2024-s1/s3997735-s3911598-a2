@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
+import { ListGroup, ListGroupItem, Button, Spinner, Container, Row, Col } from 'react-bootstrap';
 
 const GET_USERS = gql`
   query GetUsers {
@@ -24,27 +25,27 @@ const UserManagement = () => {
     const { data, loading, error } = useQuery(GET_USERS);
     const [toggleBlockUser] = useMutation(TOGGLE_BLOCK_USER);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error.message}</p>;
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <p className="text-danger">Error: {error.message}</p>;
 
     const handleToggleBlock = (id) => {
         toggleBlockUser({ variables: { id } });
     };
 
     return (
-        <div>
-            <h2>User Management</h2>
-            <ul>
+        <Container>
+            <h2 className="mb-4">User Management</h2>
+            <ListGroup>
                 {data.users.map((user) => (
-                    <li key={user.id}>
-                        {user.username} - {user.isBlocked ? 'Blocked' : 'Active'}
-                        <button onClick={() => handleToggleBlock(user.id)}>
+                    <ListGroupItem key={user.id} className="d-flex justify-content-between align-items-center">
+                        <span>{user.email} - {user.isBlocked ? 'Blocked' : 'Active'}</span>
+                        <Button variant={user.isBlocked ? 'success' : 'danger'} onClick={() => handleToggleBlock(user.id)}>
                             {user.isBlocked ? 'Unblock' : 'Block'}
-                        </button>
-                    </li>
+                        </Button>
+                    </ListGroupItem>
                 ))}
-            </ul>
-        </div>
+            </ListGroup>
+        </Container>
     );
 };
 
