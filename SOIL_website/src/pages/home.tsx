@@ -4,7 +4,7 @@ import GardeningTips from '../components/GardeningTips';
 
 export default function Home() {
     return (
-        <div className="home-container mx-auto">
+        <div className="home-container mx-auto w-full">
             {/* Header with background image and centered text */}
             <div className="flex items-center justify-center text-white text-center"
                 style={{

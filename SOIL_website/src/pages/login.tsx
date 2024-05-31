@@ -27,7 +27,7 @@ export default function Login(props: LoginProps) {
         event.preventDefault();
 
         try {
-            const response = await axios.post<User | null>('/api/login', {
+            const response = await axios.post<User | null>('/api/users/login', {
                 email: fields.email,
                 password: fields.password
             });

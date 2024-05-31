@@ -47,7 +47,7 @@ db.reviews.belongsTo(db.user);
 // Include a sync option with seed data logic included.
 db.sync = async () => {
     // Sync schema.
-    await db.sequelize.sync();
+    await db.sequelize.sync({ force: true});
 
     // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
     
@@ -65,14 +65,14 @@ async function seedData() {
 
     let hash = await argon2.hash("abc123", { type: argon2.argon2id });
     await db.user.create({
-        email: "xxx.com",
+        email: "xxx@gmail.com",
         password_hash: hash,
         first_name: "Matthew",
         last_name: "Bolger",
 
     });
     await db.user.create({
-        email: "xxxx.com",
+        email: "xxxx@gmail.com",
         password_hash: hash,
         first_name: "jian",
         last_name: "li",
@@ -85,6 +85,8 @@ async function seedData() {
         originalPrice: 3.99,
         description: "A delicious organic Apple",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1423565369.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -94,6 +96,8 @@ async function seedData() {
         originalPrice: 3.99,
         description: "A delicious organic Bananas",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394418.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -102,6 +106,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Blueberries",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1424074560.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -110,6 +116,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Strawberries",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1445482087.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -118,6 +126,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Grapes Green",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394873.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -127,6 +137,8 @@ async function seedData() {
         originalPrice: 3.99,
         description: "A delicious organic Avocados",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444081936.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -135,6 +147,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Cabbage – Red Whole",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394558.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -143,6 +157,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Chinese / Wombok",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1444188751.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -151,6 +167,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious organic Capsicum Red",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394588.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -159,6 +177,8 @@ async function seedData() {
         category: "standard",
         description: "A delicious Eggs – Free Range",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394783.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -168,6 +188,8 @@ async function seedData() {
         originalPrice: 3.99,
         description: "A delicious organic Carrots med",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388394618.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.products.create({
@@ -177,6 +199,8 @@ async function seedData() {
         originalPrice: 13.99,
         description: "A delicious organic Turmeric Fresh",
         imageUrl: 'https://www.greenlandsgrocer.com.au/wp-content/uploads/2020/09/1388408648.jpg',
+        validFrom: new Date().toDateString(),
+        validTo: new Date().toDateString(),
     });
 
     await db.shopping_cart.create({
