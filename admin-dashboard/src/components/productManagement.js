@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { Form, Button, ListGroup, ListGroupItem, Spinner, Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const GET_PRODUCTS = gql`
   query GetProducts {
@@ -28,22 +29,7 @@ const ADD_PRODUCT = gql`
       category
       originalPrice
       imageUrl
-      validForm
-      validTo
-    }
-  }
-`;
-
-const UPDATE_PRODUCT = gql`
-  mutation UpdateProduct($id: ID!, $input: ProductInput!) {
-    updateProduct(id: $id, input: $input) {
-      id
-      name
-      price
-      category
-      originalPrice
-      imageUrl
-      validForm
+      validFrom
       validTo
     }
   }
@@ -60,18 +46,18 @@ const DELETE_PRODUCT = gql`
 const ProductManagement = () => {
     const { data, loading, error } = useQuery(GET_PRODUCTS);
     const [addProduct] = useMutation(ADD_PRODUCT);
-    const [updateProduct] = useMutation(UPDATE_PRODUCT);
     const [deleteProduct] = useMutation(DELETE_PRODUCT);
-    const [newProduct, setNewProduct] = useState({ 
-        name: '', 
-        description:'',
-        price: 0, 
+    const [newProduct, setNewProduct] = useState({
+        name: '',
+        description: '',
+        price: 0,
         category: 'standard',
-        originalPrice:0,
-        imageUrl:'',
-        validForm:'',
-        validTo:''
+        originalPrice: 0,
+        imageUrl: '',
+        validFrom: '',
+        validTo: ''
     });
+    const navigate = useNavigate();
 
     if (loading) return <Spinner animation="border" />;
     if (error) return <p className="text-danger">Error: {error.message}</p>;
@@ -90,12 +76,12 @@ const ProductManagement = () => {
         });
     };
 
-    const handleUpdateProduct = (id, name, description, price, category, originalPrice, imageUrl, validFrom, validTo) => {
-        updateProduct({ variables: { id, input: { name, description, price, category, originalPrice, imageUrl, validFrom, validTo } } });
-    };
-
     const handleDeleteProduct = (id) => {
         deleteProduct({ variables: { id } });
+    };
+
+    const handleUpdateProduct = (id) => {
+        navigate(`/product/${id}`);
     };
 
     return (
@@ -158,24 +144,28 @@ const ProductManagement = () => {
                         placeholder="Image URL"
                     />
                 </Form.Group>
-                <Form.Group>
-                    <Form.Label>Valid From</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={newProduct.validFrom}
-                        onChange={(e) => setNewProduct({ ...newProduct, validFrom: e.target.value })}
-                        placeholder="Valid From"
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Valid To</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={newProduct.validTo}
-                        onChange={(e) => setNewProduct({ ...newProduct, validTo: e.target.value })}
-                        placeholder="Valid To"
-                    />
-                </Form.Group>
+                {newProduct.category === 'special' && (
+                    <>
+                        <Form.Group>
+                            <Form.Label>Valid From</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newProduct.validFrom}
+                                onChange={(e) => setNewProduct({ ...newProduct, validFrom: e.target.value })}
+                                placeholder="Valid From"
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Valid To</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newProduct.validTo}
+                                onChange={(e) => setNewProduct({ ...newProduct, validTo: e.target.value })}
+                                placeholder="Valid To"
+                            />
+                        </Form.Group>
+                    </>
+                )}
                 <Button variant="primary" onClick={handleAddProduct}>Add Product</Button>
             </Form>
             <ListGroup>
@@ -183,13 +173,7 @@ const ProductManagement = () => {
                     <ListGroupItem key={product.id} className="d-flex justify-content-between align-items-center">
                         <span>{product.name} - ${product.price} - {product.category}</span>
                         <div>
-                            <Button
-                                variant="info"
-                                className="mr-2"
-                                onClick={() => handleUpdateProduct(product.id, product.name, product.description, product.price, product.category, product.originalPrice, product.imageUrl, product.validFrom, product.validTo)}
-                            >
-                                Update
-                            </Button>
+                            <Button variant="info" className="mr-2" onClick={() => handleUpdateProduct(product.id)}>Update</Button>
                             <Button variant="danger" onClick={() => handleDeleteProduct(product.id)}>Delete</Button>
                         </div>
                     </ListGroupItem>

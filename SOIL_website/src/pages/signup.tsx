@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useToast } from "@chakra-ui/react"; // Assuming you are using Chakra UI for toast notifications
+import { useToast } from "@chakra-ui/react"; 
 
 interface SignupProps {
     loginUser: (user: User) => void;

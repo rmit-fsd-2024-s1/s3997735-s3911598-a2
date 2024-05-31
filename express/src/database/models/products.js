@@ -30,10 +30,12 @@ module.exports = (sequelize, DataTypes) =>
     },
     validFrom: {
       type: DataTypes.STRING(100),
+      defaultValue: false,  
       allowNull: true
     },
     validTo: {
       type: DataTypes.STRING(100),
+      defaultValue: false,  
       allowNull: true
     },
     

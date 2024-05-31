@@ -6,7 +6,6 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-
 const GET_REVIEWS = gql`
 query Reviews {
     reviews {
@@ -32,7 +31,6 @@ query Reviews {
         }
     }
 }
-
 `;
 
 const DELETE_REVIEW = gql`
@@ -50,7 +48,7 @@ const REVIEW_SUBSCRIPTION = gql`
       id
       content
       user {
-        first_name
+        email
       }
       product {
         name
@@ -67,7 +65,7 @@ const FLAGGED_REVIEW_SUBSCRIPTION = gql`
       id
       content
       user {
-        first_name
+        email
       }
       product {
         name
@@ -79,28 +77,39 @@ const FLAGGED_REVIEW_SUBSCRIPTION = gql`
 `;
 
 const ReviewModeration = () => {
-    const { data, loading, error, refetch } = useQuery(GET_REVIEWS);
+    const { data, loading, error } = useQuery(GET_REVIEWS);
     const [deleteReview] = useMutation(DELETE_REVIEW);
     const { data: subscriptionData } = useSubscription(REVIEW_SUBSCRIPTION);
     const { data: flaggedSubscriptionData } = useSubscription(FLAGGED_REVIEW_SUBSCRIPTION);
 
     const [reviews, setReviews] = useState([]);
 
-    // update state when data changes
     useEffect(() => {
         if (data) {
             setReviews(data.reviews);
         }
     }, [data]);
 
-    // Update state when new reviews are added
+    // useEffect(() => {
+    //     if (subscriptionData) {
+    //         setReviews((prevReviews) => [subscriptionData.reviewAdded, ...prevReviews].slice(0, 3));
+    //     }
+    // }, [subscriptionData]);
+
     useEffect(() => {
         if (subscriptionData) {
-            setReviews((prevReviews) => [subscriptionData.reviewAdded, ...prevReviews].slice(0, 3));
+            const updatedReview = subscriptionData.reviewAdded;
+            setReviews((prevReviews) => {
+                const index = prevReviews.findIndex(review => review.id === updatedReview.id);
+                if (index !== -1) {
+                    prevReviews[index] = updatedReview;
+                    return [...prevReviews];
+                }
+                return [updatedReview, ...prevReviews];
+            });
         }
     }, [subscriptionData]);
-    
-    // Update state when reviews are flagged
+
     useEffect(() => {
         if (flaggedSubscriptionData) {
             setReviews((prevReviews) => {
@@ -114,22 +123,22 @@ const ReviewModeration = () => {
             });
         }
     }, [flaggedSubscriptionData]);
-    
 
     if (loading) return <Spinner animation="border" />;
     if (error) return <p className="text-danger">Error: {error.message}</p>;
 
-    // Handle review deletion
     const handleDelete = async (id) => {
-        await deleteReview({ variables: { id } });
-        
+        try {
+            await deleteReview({ variables: { id } });
+        } catch (error) {
+            console.error("Error deleting review:", error);
+        }
     };
 
-    // Get the most recent 2 to 3 reviews
+
     const recentReviews = reviews.slice(0, 3);
     const flaggedReviews = reviews.filter(review => review.flagged && !review.isDeleted);
 
-    // Calculate review statistics
     const reviewStats = reviews.reduce((acc, review) => {
         const product = review.product.name;
         if (!acc[product]) {
@@ -175,22 +184,22 @@ const ReviewModeration = () => {
                 <Col md={6}>
                     <h3>New Reviews</h3>
                     <ListGroup>
-                        {recentReviews.map((review) => (
+                        {recentReviews.length > 0 ? recentReviews.map((review) => (
                             <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
-                                <span>{review.isDeleted ? '[**** This review has been deleted by the admin ***]' : `${review.content} - ${review.user.username} - ${review.product.name}`}</span>
+                                <span>{review.isDeleted ? '[**** This review has been deleted by the admin ***]' : `${review.content} - ${review.user?.email} - ${review.product?.name}`}</span>
                                 {!review.isDeleted && <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>}
                             </ListGroupItem>
-                        ))}
+                        )) : <p>No new reviews</p>}
                     </ListGroup>
-                    <h3 className="mt-4">Flagged Reviews</h3>
                     <ListGroup>
-                        {flaggedReviews.map((review) => (
+                        {flaggedReviews.length > 0 ? flaggedReviews.map((review) => (
                             <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
-                                <span>{`${review.content} - ${review.user.username} - ${review.product.name}`}</span>
+                                <span>{`${review.content} - ${review.user?.email} - ${review.product?.name}`}</span>
                                 {!review.isDeleted && <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>}
                             </ListGroupItem>
-                        ))}
+                        )) : <p>No flagged reviews</p>}
                     </ListGroup>
+
                 </Col>
                 <Col md={6}>
                     <h3>Review Statistics</h3>

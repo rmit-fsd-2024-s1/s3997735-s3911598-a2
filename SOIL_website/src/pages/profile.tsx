@@ -6,22 +6,13 @@ import {
     FormLabel,
     Input,
     Button,
-    Popover,
-    useDisclosure,
-    PopoverTrigger,
-    PopoverContent,
-    PopoverHeader,
-    PopoverArrow,
-    PopoverCloseButton,
-    PopoverBody,
-    PopoverFooter,
-    ButtonGroup,
     useToast,
 } from '@chakra-ui/react'
 
 interface User {
     id: number;
-    username: string;
+    first_name: string;
+    last_name: string;
     email: string;
     joinDate: string;
 }
@@ -29,18 +20,23 @@ interface User {
 const Profile: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [edit, setEdit] = useState<boolean>(false);
-    const [username, setUsername] = useState<string>('');
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const { isOpen, onToggle, onClose } = useDisclosure();
     const toast = useToast();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await axios.get<User>('/api/user');
+                const userId = localStorage.getItem('userId'); // userID  store in localstorage
+                if (!userId) {
+                    throw new Error("No user ID found in localStorage");
+                }
+                const response = await axios.get<User>(`/api/users/profile/${userId}`);
                 setUser(response.data);
-                setUsername(response.data.username);
+                setFirstName(response.data.first_name);
+                setLastName(response.data.last_name);
                 setEmail(response.data.email);
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -53,7 +49,7 @@ const Profile: React.FC = () => {
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (username === user?.username && email === user?.email) {
+        if (firstName === user?.first_name && lastName === user?.last_name && email === user?.email) {
             toast({
                 title: 'No changes detected.',
                 description: "You did not change anything!",
@@ -77,33 +73,19 @@ const Profile: React.FC = () => {
         }
 
         try {
-            await axios.put('/api/user', { username, email });
+            const userId = localStorage.getItem('userId'); // get userID from localstorage
+            await axios.put(`/api/users/profile/${userId}`, { first_name: firstName, last_name: lastName, email });
             toast({
                 title: 'Update successful!',
                 status: 'success',
                 duration: 2500,
             });
-            setUser({ ...user!, username, email });
+            setUser({ ...user!, first_name: firstName, last_name: lastName, email });
             setEdit(false);
         } catch (error) {
             toast({
                 title: 'Error updating profile',
                 description: 'An error occurred while updating your profile. Please try again.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
-        }
-    };
-
-    const handleDelete = async () => {
-        try {
-            await axios.delete('/api/user');
-            navigate('/');
-        } catch (error) {
-            toast({
-                title: 'Error deleting account',
-                description: 'An error occurred while deleting your account. Please try again.',
                 status: 'error',
                 duration: 3000,
                 isClosable: true,
@@ -118,8 +100,12 @@ const Profile: React.FC = () => {
                     {edit ? (
                         <>
                             <FormControl>
-                                <FormLabel>Username</FormLabel>
-                                <Input type='text' value={username} onChange={e => setUsername(e.target.value)} />
+                                <FormLabel>First Name</FormLabel>
+                                <Input type='text' value={firstName} onChange={e => setFirstName(e.target.value)} />
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Last Name</FormLabel>
+                                <Input type='text' value={lastName} onChange={e => setLastName(e.target.value)} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Email address</FormLabel>
@@ -131,36 +117,12 @@ const Profile: React.FC = () => {
                         </>
                     ) : (
                         <>
-                            <h1>Username: {user?.username} </h1>
+                            <h1>First Name: {user?.first_name} </h1>
+                            <h1>Last Name: {user?.last_name} </h1>
                             <h1>Email: {user?.email}</h1>
                             <h1>Join Date: {user?.joinDate ? new Date(user.joinDate).toISOString().split('T')[0] : 'Unavailable'}</h1>
                             <div className="flex gap-3">
                                 <Button onClick={() => setEdit(true)}>Edit</Button>
-                                <Popover
-                                    returnFocusOnClose={false}
-                                    isOpen={isOpen}
-                                    onClose={onClose}
-                                    placement='right'
-                                    closeOnBlur={false}
-                                >
-                                    <PopoverTrigger>
-                                        <Button onClick={onToggle}>Delete</Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent>
-                                        <PopoverHeader fontWeight='semibold'>Confirmation</PopoverHeader>
-                                        <PopoverArrow />
-                                        <PopoverCloseButton />
-                                        <PopoverBody>
-                                            Are you sure you want to delete your account?
-                                        </PopoverBody>
-                                        <PopoverFooter display='flex' justifyContent='flex-end'>
-                                            <ButtonGroup size='sm'>
-                                                <Button variant='outline' onClick={onClose}>Cancel</Button>
-                                                <Button colorScheme='red' onClick={handleDelete}>Delete</Button>
-                                            </ButtonGroup>
-                                        </PopoverFooter>
-                                    </PopoverContent>
-                                </Popover>
                             </div>
                         </>
                     )}

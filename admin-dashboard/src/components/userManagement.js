@@ -29,8 +29,14 @@ const UserManagement = () => {
     if (error) return <p className="text-danger">Error: {error.message}</p>;
 
     const handleToggleBlock = (id) => {
-        console.log(id);
-        toggleBlockUser({ variables: { id } });
+        console.log("Toggling block for user with ID:", id);
+        toggleBlockUser({ variables: { id } })
+            .then(response => {
+                console.log("Toggle response:", response);
+            })
+            .catch(err => {
+                console.error("Error toggling block:", err);
+            });
     };
 
     return (
