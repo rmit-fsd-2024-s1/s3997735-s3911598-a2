@@ -21,7 +21,6 @@ const typeDefs = gql`
     price: Float!
     category: String!
     originalPrice: Float
-    imageUrl: String
     validFrom: String
     validTo: String
   }
@@ -41,7 +40,6 @@ const typeDefs = gql`
     price: Float!
     category: String!
     originalPrice: Float
-    imageUrl: String
     validFrom: String
     validTo: String
   }
@@ -51,6 +49,7 @@ const typeDefs = gql`
     products: [Product!]!
     reviews: [Review!]!
     flaggedReviews: [Review!]!
+    product(id: ID!): Product
   }
 
   type Mutation {
@@ -110,54 +109,98 @@ const resolvers = {
         flaggedReviews: async () => await db.reviews.findAll({
             where: { flagged: true, isDeleted: false },
             include: [db.user, db.products]
-        })
+        }),
+        product: async (_, { id }) => {
+            return await db.products.findByPk(id);
+        }
     },
     Mutation: {
         toggleBlockUser: async (_, { id }) => {
             const user = await db.user.findByPk(id);
+            if (!user) throw new Error('User not found');
             user.isBlocked = !user.isBlocked;
             await user.save();
             return user;
         },
-        
-        addProduct: async (_, { input }) => await db.products.create(input),
-        
-        updateProduct: async (_, { id, input }) => {
-            const product = await db.products.findByPk(id);
-            return await product.update(input);
-        },
-        
-        deleteProduct: async (_, { id }) => {
-            const product = await db.products.findByPk(id);
-            await product.destroy();
-            return product;
-        },
-        
-        deleteReview: async (_, { id }) => {
-            const review = await db.reviews.findByPk(id);
-            review.isDeleted = true;
-            await review.save();
-            pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
-            pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
-            return review;
-        },
-        
-        addReview: async (_, { content, userId, productId }) => {
-            const flagged = shouldFlagReview(content);
-            const review = await db.reviews.create({ content, userId, productId, flagged });
-            pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
-            if (flagged) {
-                pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
+
+        addProduct: async (_, { input }) => {
+            try {
+                console.log("Adding product with input:", input); // 调试用
+                return await db.products.create(input);
+            } catch (error) {
+                console.error("Error adding product:", error); // 调试用
+                throw new Error('Error adding product');
             }
-            return review;
         },
-        
+
+        updateProduct: async (_, { id, input }) => {
+            try {
+                console.log("Received id:", id); // 调试用
+                console.log("Received input:", input); // 调试用
+                const product = await db.products.findByPk(id);
+                if (!product) throw new Error('Product not found');
+                return await product.update(input);
+            } catch (error) {
+                console.error("Error updating product:", error); // 调试用
+                throw new Error('Error updating product');
+            }
+        },
+
+        deleteProduct: async (_, { id }) => {
+            try {
+                const product = await db.products.findByPk(id);
+                if (!product) throw new Error('Product not found');
+                await product.destroy();
+                return product;
+            } catch (error) {
+                throw new Error('Error deleting product');
+            }
+        },
+
+        deleteReview: async (_, { id }) => {
+            try {
+                const review = await db.reviews.findByPk(id);
+                if (!review) throw new Error('Review not found');
+                review.isDeleted = true;
+                await review.save();
+                pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+                pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
+                return review;
+            } catch (error) {
+                throw new Error('Error deleting review');
+            }
+        },
+
+        addReview: async (_, { content, userId, productId }) => {
+            try {
+                const user = await db.user.findByPk(userId);
+                if (!user) throw new Error('User not found');
+                const product = await db.products.findByPk(productId);
+                if (!product) throw new Error('Product not found');
+
+                const flagged = shouldFlagReview(content);
+                const review = await db.reviews.create({ content, userId, productId, flagged });
+                pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+                if (flagged) {
+                    pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
+                }
+                return review;
+            } catch (error) {
+                throw new Error('Error adding review');
+            }
+        },
+
         flagReview: async (_, { id }) => {
-            const review = await db.reviews.findByPk(id);
-            review.flagged = true;
-            await review.save();
-            pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
-            return review;
+            try {
+                const review = await db.reviews.findByPk(id);
+                if (!review) throw new Error('Review not found');
+                review.flagged = true;
+                await review.save();
+                pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
+                return review;
+            } catch (error) {
+                throw new Error('Error flagging review');
+            }
         }
     },
     Subscription: {

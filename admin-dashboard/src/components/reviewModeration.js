@@ -25,7 +25,6 @@ query Reviews {
             price
             category
             originalPrice
-            imageUrl
             validFrom
             validTo
         }

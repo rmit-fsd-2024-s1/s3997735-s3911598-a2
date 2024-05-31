@@ -12,7 +12,6 @@ const GET_PRODUCT = gql`
       price
       category
       originalPrice
-      imageUrl
       validFrom
       validTo
     }
@@ -28,7 +27,6 @@ const UPDATE_PRODUCT = gql`
       price
       category
       originalPrice
-      imageUrl
       validFrom
       validTo
     }
@@ -45,7 +43,6 @@ const ProductDetail = () => {
         price: 0,
         category: 'standard',
         originalPrice: 0,
-        imageUrl: '',
         validFrom: '',
         validTo: ''
     });
@@ -77,7 +74,14 @@ const ProductDetail = () => {
             setErrors(validationErrors);
             return;
         }
-        updateProduct({ variables: { id, input: product } })
+
+        
+        const { __typename, id, ...cleanedProduct } = product;
+
+        console.log("Updating product with id:", id); // 调试用
+        console.log("Product input:", cleanedProduct); // 调试用
+
+        updateProduct({ variables: { id, input: cleanedProduct } })
             .then(() => {
                 setUpdateSuccess(true);
                 setUpdateError(null);
@@ -88,6 +92,8 @@ const ProductDetail = () => {
             });
     };
 
+
+
     if (loading) return <Spinner animation="border" />;
     if (error) return <p className="text-danger">Error: {error.message}</p>;
 
@@ -97,46 +103,47 @@ const ProductDetail = () => {
             {updateError && <Alert variant="danger">{updateError}</Alert>}
             {updateSuccess && <Alert variant="success">Product updated successfully</Alert>}
             <Form>
-                <Form.Group>
+                <Form.Group controlId="formName">
                     <Form.Label>Product Name</Form.Label>
                     <Form.Control
                         type="text"
                         value={product.name}
-                        isInvalid={!!errors.name}
                         onChange={(e) => setProduct({ ...product, name: e.target.value })}
-                        placeholder="Product Name"
+                        isInvalid={!!errors.name}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.name}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group>
+
+                <Form.Group controlId="formDescription">
                     <Form.Label>Description</Form.Label>
                     <Form.Control
-                        type="text"
+                        as="textarea"
+                        rows={3}
                         value={product.description}
-                        isInvalid={!!errors.description}
                         onChange={(e) => setProduct({ ...product, description: e.target.value })}
-                        placeholder="Description"
+                        isInvalid={!!errors.description}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.description}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group>
-                    <Form.Label>Product Price</Form.Label>
+
+                <Form.Group controlId="formPrice">
+                    <Form.Label>Price</Form.Label>
                     <Form.Control
                         type="number"
                         value={product.price}
-                        isInvalid={!!errors.price}
                         onChange={(e) => setProduct({ ...product, price: parseFloat(e.target.value) })}
-                        placeholder="Product Price"
+                        isInvalid={!!errors.price}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.price}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group>
+
+                <Form.Group controlId="formCategory">
                     <Form.Label>Category</Form.Label>
                     <Form.Control
                         as="select"
@@ -147,29 +154,29 @@ const ProductDetail = () => {
                         <option value="special">Special</option>
                     </Form.Control>
                 </Form.Group>
+
                 {product.category === 'special' && (
                     <>
-                        <Form.Group>
+                        <Form.Group controlId="formValidFrom">
                             <Form.Label>Valid From</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="date"
                                 value={product.validFrom}
-                                isInvalid={!!errors.validFrom}
                                 onChange={(e) => setProduct({ ...product, validFrom: e.target.value })}
-                                placeholder="Valid From"
+                                isInvalid={!!errors.validFrom}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {errors.validFrom}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group>
+
+                        <Form.Group controlId="formValidTo">
                             <Form.Label>Valid To</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="date"
                                 value={product.validTo}
-                                isInvalid={!!errors.validTo}
                                 onChange={(e) => setProduct({ ...product, validTo: e.target.value })}
-                                placeholder="Valid To"
+                                isInvalid={!!errors.validTo}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {errors.validTo}
@@ -177,24 +184,7 @@ const ProductDetail = () => {
                         </Form.Group>
                     </>
                 )}
-                <Form.Group>
-                    <Form.Label>Original Price</Form.Label>
-                    <Form.Control
-                        type="number"
-                        value={product.originalPrice}
-                        onChange={(e) => setProduct({ ...product, originalPrice: parseFloat(e.target.value) })}
-                        placeholder="Original Price"
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Image URL</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={product.imageUrl}
-                        onChange={(e) => setProduct({ ...product, imageUrl: e.target.value })}
-                        placeholder="Image URL"
-                    />
-                </Form.Group>
+
                 <Button variant="primary" onClick={handleUpdateProduct}>Update Product</Button>
             </Form>
         </Container>

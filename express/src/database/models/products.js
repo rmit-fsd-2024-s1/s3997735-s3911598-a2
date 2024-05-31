@@ -25,17 +25,15 @@ module.exports = (sequelize, DataTypes) =>
       allowNull: true
     },
     imageUrl: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(1000),
       allowNull: true
     },
     validFrom: {
       type: DataTypes.STRING(100),
-      defaultValue: false,  
       allowNull: true
     },
     validTo: {
       type: DataTypes.STRING(100),
-      defaultValue: false,  
       allowNull: true
     },
     
