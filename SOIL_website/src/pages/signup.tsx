@@ -60,7 +60,7 @@ const Signup: React.FC<SignupProps> = ({ loginUser }) => {
         }
 
         try {
-            const response = await axios.post<User>('/api/signup', {
+            const response = await axios.post<User>('http://localhost:4000/api/users/signup', {
                 first_name: firstName,
                 last_name: lastName,
                 email,
