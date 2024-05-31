@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) =>
       primaryKey: true
     },
     content: {
-      type: DataTypes.STRING(1000),
+      type: DataTypes.STRING(100),
       allowNull: false
     },
     rating: {
@@ -14,13 +14,13 @@ module.exports = (sequelize, DataTypes) =>
       allowNull: false
     },
     isDeleted: {
-      type: DataTypes.BOOLEAN,
-        defaultValue: false 
+      type: DataTypes.BOOLEAN, 
+      defaultValue: false 
     }, 
       // for hd part
     flagged: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     parentId: {
       type: DataTypes.INTEGER,

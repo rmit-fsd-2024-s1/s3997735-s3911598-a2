@@ -171,7 +171,6 @@ const ReviewModeration = () => {
     return (
         <Container>
             <h2 className="mb-4">Review Moderation</h2>
-            <Button onClick={() => refetch()}>Refresh Reviews</Button>
             <Row>
                 <Col md={6}>
                     <h3>New Reviews</h3>

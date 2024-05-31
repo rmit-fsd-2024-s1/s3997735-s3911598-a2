@@ -5,6 +5,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const path = require('path');
+const bodyParser = require('body-parser');
 
 // Added for subscription support.
 const { WebSocketServer } = require("ws");

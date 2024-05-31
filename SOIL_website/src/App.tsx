@@ -15,8 +15,22 @@ import CheckoutForm from "./components/CheckoutForm";
 import Detail from './pages/productDetail';
 import Products from './pages/products';
 
+interface User {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+}
 
-function App() {
+const App: React.FC = () => {
+    const [user, setUser] = useState<User | null>(null);
+
+    const loginUser = (user: User) => {
+        setUser(user);
+    };
+
+
+
 
     return (
         <div className="App">
@@ -26,8 +40,8 @@ function App() {
                     <div className='flex-grow flex flex-col items-center justify-center text-center'>
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/signup" element={<Signup />} />
-                            <Route path="/login" element={<Login />} />
+                            <Route path="/signup" element={<Signup loginUser={loginUser} />} />
+                            <Route path="/login" element={<Login loginUser={loginUser} />} />
                             <Route path="/shopping-cart" element={<ShoppingCart />} />
                             <Route path="/checkout" element={<CheckoutForm />} />
                             <Route path="/profile" element={<Profile />} />
