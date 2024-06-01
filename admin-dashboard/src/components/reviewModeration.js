@@ -1,45 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useQuery, useMutation, gql, useSubscription } from '@apollo/client';
-import { ListGroup, ListGroupItem, Button, Spinner, Container, Row, Col } from 'react-bootstrap';
-import { Bar, Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import React, {useEffect, useState} from 'react';
+import client from "../apollo/client.js";
+import gql from "graphql-tag";
+import {getReview, deleteReview} from "../data/repository";
+// import { useQuery, useMutation, gql, useSubscription } from '@apollo/client';
+import {ListGroup, ListGroupItem, Button, Spinner, Container, Row, Col, Alert} from 'react-bootstrap';
+import {Bar, Pie} from 'react-chartjs-2';
+import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement} from 'chart.js';
 
+// Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-const GET_REVIEWS = gql`
-query Reviews {
-    reviews {
-        id
-        content
-        isDeleted
-        flagged
-        user {
-            id
-            email
-            isBlocked
-        }
-        product {
-            id
-            name
-            description
-            price
-            category
-            originalPrice
-            validFrom
-            validTo
-        }
-    }
-}
-`;
+// GraphQL queries, mutations, and subscriptions
 
-const DELETE_REVIEW = gql`
-  mutation DeleteReview($id: ID!) {
-    deleteReview(id: $id) {
-      id
-      isDeleted
-    }
-  }
-`;
 
 const REVIEW_SUBSCRIPTION = gql`
   subscription OnReviewAdded {
@@ -76,69 +48,114 @@ const FLAGGED_REVIEW_SUBSCRIPTION = gql`
 `;
 
 const ReviewModeration = () => {
-    const { data, loading, error } = useQuery(GET_REVIEWS);
-    const [deleteReview] = useMutation(DELETE_REVIEW);
-    const { data: subscriptionData } = useSubscription(REVIEW_SUBSCRIPTION);
-    const { data: flaggedSubscriptionData } = useSubscription(FLAGGED_REVIEW_SUBSCRIPTION);
 
     const [reviews, setReviews] = useState([]);
+    const [reviewsFlag, setFlagReviews] = useState([]);
+    // Load initial reviews data
+    // Load comments.
+    useEffect(() => {
+        async function loadReviews() {
+            const currentComments = await getReview();
+
+            setReviews(currentComments.slice(0, 3));
+        }
+
+        loadReviews();
+    }, []);
+
+
+    // Setup subscription.
+    useEffect(() => {
+        // Subscripe to the GraphQL comment_added subscription.
+        const subscription = client.subscribe({
+            query: gql`
+       subscription OnReviewAdded {
+    reviewAdded {
+      id
+      content
+      user {
+        email
+      }
+      product {
+        name
+      }
+     
+      flagged
+    }
+  }`
+        }).subscribe({
+            next: (payload) => {
+                console.log(payload.data);
+                const newReview = payload.data.reviewAdded;
+
+                setReviews(prevReviews => {
+                    const review = [newReview, ...prevReviews];
+                    return review.slice(0, 3);
+                });
+
+
+            },
+            error: (error) => {
+
+
+            }
+        });
+
+        // Unsubscripe from the subscription when the effect unmounts.
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
 
     useEffect(() => {
-        if (data) {
-            setReviews(data.reviews);
-        }
-    }, [data]);
+        const flaggedSubscription = client.subscribe({
+            query: gql`
+  subscription OnReviewFlagged {
+    reviewFlagged {
+      id
+      content
+      user {
+        email
+      }
+      product {
+        name
+      }
+    
+      flagged
+    }
+  }
+`
+        }).subscribe({
+            next: (payload) => {
+                // console.log(payload.data);
+                const flaggedReview = payload.data.reviewFlagged;
+                console.log(flaggedReview);
+                setFlagReviews(prevFlagReviews => [flaggedReview, ...prevFlagReviews]);
+            },
+            error: (error) => {
+                console.error("Subscription error:", error);
+            }
+        });
 
-    // useEffect(() => {
-    //     if (subscriptionData) {
-    //         setReviews((prevReviews) => [subscriptionData.reviewAdded, ...prevReviews].slice(0, 3));
-    //     }
-    // }, [subscriptionData]);
-
-    useEffect(() => {
-        if (subscriptionData) {
-            const updatedReview = subscriptionData.reviewAdded;
-            setReviews((prevReviews) => {
-                const index = prevReviews.findIndex(review => review.id === updatedReview.id);
-                if (index !== -1) {
-                    prevReviews[index] = updatedReview;
-                    return [...prevReviews];
-                }
-                return [updatedReview, ...prevReviews];
-            });
-        }
-    }, [subscriptionData]);
-
-    useEffect(() => {
-        if (flaggedSubscriptionData) {
-            const flaggedReview = flaggedSubscriptionData.reviewFlagged;
-            setReviews((prevReviews) => {
-                const index = prevReviews.findIndex(review => review.id === flaggedReview.id);
-                if (index !== -1) {
-                    prevReviews[index] = flaggedReview;
-                    return [...prevReviews];
-                }
-                return [flaggedReview, ...prevReviews];
-            });
-        }
-    }, [flaggedSubscriptionData]);
-
-
-    if (loading) return <Spinner animation="border" />;
-    if (error) return <p className="text-danger">Error: {error.message}</p>;
-
+        return () => {
+            flaggedSubscription.unsubscribe();
+        };
+    }, []);
+    // Handle review deletion
     const handleDelete = async (id) => {
         try {
-            await deleteReview({ variables: { id } });
+            await deleteReview(id);
+            setFlagReviews(prevFlagReviews => prevFlagReviews.filter(review => review.id !== id));
         } catch (error) {
             console.error("Error deleting review:", error);
         }
     };
 
+    // // Extract recent reviews and flagged reviews
+    // const recentReviews = reviews.slice(0, 3);
 
-    const recentReviews = reviews.slice(0, 3);
-    const flaggedReviews = reviews.filter(review => review.flagged && !review.isDeleted);
 
+    // Generate review statistics data
     const reviewStats = reviews.reduce((acc, review) => {
         const product = review.product.name;
         if (!acc[product]) {
@@ -149,6 +166,7 @@ const ReviewModeration = () => {
         return acc;
     }, {});
 
+    // Data for review statistics chart
     const reviewStatsData = {
         labels: Object.keys(reviewStats),
         datasets: [
@@ -162,6 +180,7 @@ const ReviewModeration = () => {
         ],
     };
 
+    // Data for review length chart
     const reviewLengthData = {
         labels: ['Short', 'Medium', 'Long'],
         datasets: [
@@ -184,16 +203,16 @@ const ReviewModeration = () => {
                 <Col md={6}>
                     <h3>New Reviews</h3>
                     <ListGroup>
-                        {recentReviews.length > 0 ? recentReviews.map((review) => (
+                        {reviews.length > 0 ? reviews.map((review) => (
                             <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
-                                <span>{review.isDeleted ? '[**** This review has been deleted by the admin ***]' : `${review.content} - ${review.user?.email} - ${review.product?.name}`}</span>
-                                {!review.isDeleted && <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>}
+                                <span>{review.isDeleted ? '[**** This review has been deleted by you ***]' : `${review.content} - ${review.user?.email} - ${review.product?.name}`}</span>
+                                {/*{!review.isDeleted && <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>}*/}
                             </ListGroupItem>
                         )) : <p>No new reviews</p>}
                     </ListGroup>
                     <h3>Flagged Reviews</h3>
                     <ListGroup>
-                        {flaggedReviews.length > 0 ? flaggedReviews.map((review) => (
+                        {reviewsFlag.length > 0 ? reviewsFlag.map((review) => (
                             <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
                                 <span>{`${review.content} - ${review.user?.email} - ${review.product?.name}`}</span>
                                 {!review.isDeleted && <Button variant="danger" onClick={() => handleDelete(review.id)}>Delete</Button>}
@@ -204,7 +223,7 @@ const ReviewModeration = () => {
                 <Col md={6}>
                     <h3>Review Statistics</h3>
                     <Bar data={reviewStatsData} options={{ responsive: true }} />
-                    <Pie data={reviewStatsData} options={{ responsive: true }} />
+                    <Pie data={reviewLengthData} options={{ responsive: true }} />
                 </Col>
             </Row>
         </Container>

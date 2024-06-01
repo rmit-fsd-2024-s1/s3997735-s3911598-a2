@@ -68,35 +68,7 @@ const typeDefs = gql`
   }
 `;
 
-const shouldFlagReview = (content) => {
-    const offensiveLanguage = ['trash', 'idiots'];
-    const spamPatterns = [/http:\/\/\S+/i, /https:\/\/\S+/i, /www\.\S+/i];
-    const irrelevantContent = ['The weather is great today'];
-    const privacyViolations = [/address is \d+ \S+/i];
-    const obsceneOrViolentContent = ['fuck', 'smash it'];
 
-    for (let word of offensiveLanguage) {
-        if (content.includes(word)) return true;
-    }
-
-    for (let pattern of spamPatterns) {
-        if (pattern.test(content)) return true;
-    }
-
-    for (let word of irrelevantContent) {
-        if (content.includes(word)) return true;
-    }
-
-    for (let pattern of privacyViolations) {
-        if (pattern.test(content)) return true;
-    }
-
-    for (let word of obsceneOrViolentContent) {
-        if (content.includes(word)) return true;
-    }
-
-    return false;
-};
 
 const resolvers = {
     Query: {
@@ -135,13 +107,13 @@ const resolvers = {
 
         updateProduct: async (_, { id, input }) => {
             try {
-                console.log("Received id:", id); // 调试用
-                console.log("Received input:", input); // 调试用
+                console.log("Received id:", id); // testing
+                console.log("Received input:", input); // testing
                 const product = await db.products.findByPk(id);
                 if (!product) throw new Error('Product not found');
                 return await product.update(input);
             } catch (error) {
-                console.error("Error updating product:", error); // 调试用
+                console.error("Error updating product:", error); // testing
                 throw new Error('Error updating product');
             }
         },
@@ -171,24 +143,24 @@ const resolvers = {
             }
         },
 
-        addReview: async (_, { content, userId, productId }) => {
-            try {
-                const user = await db.user.findByPk(userId);
-                if (!user) throw new Error('User not found');
-                const product = await db.products.findByPk(productId);
-                if (!product) throw new Error('Product not found');
-
-                const flagged = shouldFlagReview(content);
-                const review = await db.reviews.create({ content, userId, productId, flagged });
-                pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
-                if (flagged) {
-                    pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
-                }
-                return review;
-            } catch (error) {
-                throw new Error('Error adding review');
-            }
-        },
+        // addReview: async (_, { content, userId, productId }) => {
+        //     try {
+        //         const user = await db.user.findByPk(userId);
+        //         if (!user) throw new Error('User not found');
+        //         const product = await db.products.findByPk(productId);
+        //         if (!product) throw new Error('Product not found');
+        //
+        //         const flagged = shouldFlagReview(content);
+        //         const review = await db.reviews.create({ content, userId, productId, flagged });
+        //         pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+        //         if (flagged) {
+        //             pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
+        //         }
+        //         return review;
+        //     } catch (error) {
+        //         throw new Error('Error adding review');
+        //     }
+        // },
 
         flagReview: async (_, { id }) => {
             try {
@@ -215,5 +187,8 @@ const resolvers = {
 
 module.exports = {
     typeDefs,
-    resolvers
+    resolvers,
+    pubsub,
+    REVIEW_ADDED_TRIGGER,
+    REVIEW_FLAGGED_TRIGGER
 };

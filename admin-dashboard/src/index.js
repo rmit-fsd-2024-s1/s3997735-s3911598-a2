@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import ApolloProviderWrapper from './ApolloClient';
+// import ApolloProviderWrapper from './ApolloClient';
 
-ReactDOM.render(
-    <ApolloProviderWrapper>
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+root.render(
+    <React.StrictMode>
         <App />
-    </ApolloProviderWrapper>,
-    document.getElementById('root')
+    </React.StrictMode>
 );
+
 
 
 // If you want to start measuring performance in your app, pass a function
