@@ -1,5 +1,4 @@
 const db = require("../database");
-const argon2 = require("argon2");
 
 // get all products by category
 exports.all = async (req, res) => {

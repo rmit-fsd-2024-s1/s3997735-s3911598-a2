@@ -1,5 +1,4 @@
 const db = require("../database");
-const argon2 = require("argon2");
 
 // Select all products with user_id
 exports.all = async (req, res) => {

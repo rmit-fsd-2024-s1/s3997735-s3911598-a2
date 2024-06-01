@@ -6,7 +6,6 @@ const { PubSub } = require("graphql-subscriptions");
 const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
 exports.all = async (req, res) => {
     try {
-        console.log(JSON.stringify(req.body));
         // use raw query to get the nested comments and join users table to get the author name
         const reviews = await db.sequelize.query(`WITH RECURSIVE comment_tree AS (
             SELECT 
@@ -45,6 +44,7 @@ exports.all = async (req, res) => {
         result = buildNestedReviews(reviews);
         res.json({ result: result });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
