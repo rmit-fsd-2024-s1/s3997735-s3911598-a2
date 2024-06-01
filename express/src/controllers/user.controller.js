@@ -20,6 +20,9 @@ exports.login = async (req, res) => {
         if (user === null || await argon2.verify(user.password_hash, req.body.password) === false) {
             // Login failed
             res.json(null);
+        } else if (user.isBlocked) {
+            // User is blocked
+            res.status(403).json({ message: 'You have been blocked by the admin.' });
         } else {
             res.json({ id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name });
         }

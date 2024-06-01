@@ -1,16 +1,13 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setCurrentUser } from "../data/repository";
-import { User } from "../data/repository";
+import { setCurrentUser, User } from "../data/repository";
 
-
-export default function Login() {
+const Login: React.FC = () => {
     const navigate = useNavigate();
     const [fields, setFields] = useState({ email: "", password: "" });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // Generic change handler.
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setFields({ ...fields, [event.target.name]: event.target.value });
     };
@@ -24,22 +21,22 @@ export default function Login() {
                 password: fields.password
             });
 
-            const user = response.data as User | null;
+            const user = response.data;
 
             if (user === null) {
-                // Login failed, reset password field to blank and set error message.
                 setFields({ ...fields, password: "" });
                 setErrorMessage("Email and/or password invalid, please try again.");
                 return;
             }
 
             setCurrentUser(user);
-
-            // Navigate to the home page.
             navigate("/");
-        } catch (error) {
-            // Handle error.
-            setErrorMessage("An error occurred. Please try again.");
+        } catch (error: any) {
+            if (error.response && error.response.status === 403) {
+                setErrorMessage("You have been blocked by the admin.");
+            } else {
+                setErrorMessage("An error occurred. Please try again.");
+            }
         }
     };
 
@@ -75,14 +72,16 @@ export default function Login() {
                         <div className="form-group text-center">
                             <input type="submit" className="btn btn-primary" value="Login" />
                         </div>
-                        {errorMessage !== null &&
+                        {errorMessage !== null && (
                             <div className="form-group">
                                 <span className="text-danger">{errorMessage}</span>
                             </div>
-                        }
+                        )}
                     </form>
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export default Login;

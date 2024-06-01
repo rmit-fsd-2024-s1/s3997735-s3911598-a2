@@ -111,17 +111,18 @@ const ReviewModeration = () => {
 
     useEffect(() => {
         if (flaggedSubscriptionData) {
+            const flaggedReview = flaggedSubscriptionData.reviewFlagged;
             setReviews((prevReviews) => {
-                const newReview = flaggedSubscriptionData.reviewFlagged;
-                const index = prevReviews.findIndex(review => review.id === newReview.id);
+                const index = prevReviews.findIndex(review => review.id === flaggedReview.id);
                 if (index !== -1) {
-                    prevReviews[index] = newReview;
+                    prevReviews[index] = flaggedReview;
                     return [...prevReviews];
                 }
-                return [newReview, ...prevReviews];
+                return [flaggedReview, ...prevReviews];
             });
         }
     }, [flaggedSubscriptionData]);
+
 
     if (loading) return <Spinner animation="border" />;
     if (error) return <p className="text-danger">Error: {error.message}</p>;
@@ -190,6 +191,7 @@ const ReviewModeration = () => {
                             </ListGroupItem>
                         )) : <p>No new reviews</p>}
                     </ListGroup>
+                    <h3>Flagged Reviews</h3>
                     <ListGroup>
                         {flaggedReviews.length > 0 ? flaggedReviews.map((review) => (
                             <ListGroupItem key={review.id} className="d-flex justify-content-between align-items-center">
@@ -198,7 +200,6 @@ const ReviewModeration = () => {
                             </ListGroupItem>
                         )) : <p>No flagged reviews</p>}
                     </ListGroup>
-
                 </Col>
                 <Col md={6}>
                     <h3>Review Statistics</h3>

@@ -73,7 +73,7 @@ const shouldFlagReview = (content) => {
     const spamPatterns = [/http:\/\/\S+/i, /https:\/\/\S+/i, /www\.\S+/i];
     const irrelevantContent = ['The weather is great today'];
     const privacyViolations = [/address is \d+ \S+/i];
-    const obsceneOrViolentContent = ['Fuck', 'smash it'];
+    const obsceneOrViolentContent = ['fuck', 'smash it'];
 
     for (let word of offensiveLanguage) {
         if (content.includes(word)) return true;

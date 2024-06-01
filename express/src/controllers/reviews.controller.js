@@ -6,12 +6,14 @@ const { PubSub } = require("graphql-subscriptions");
 const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
 exports.all = async (req, res) => {
     try {
+
         // use raw query to get the nested comments and join users table to get the author name
+        console.log(JSON.stringify(req.body));
         const reviews = await db.sequelize.query(`WITH RECURSIVE comment_tree AS (
             SELECT 
                 r.id, 
                 r.rating,
-                r.content, 
+                CASE WHEN r.isDeleted THEN '[**** This review has been deleted by the admin ***]' ELSE r.content END AS content, 
                 r.parentId, 
                 0 AS level, 
                 CONCAT(u.first_name, ' ', u.last_name) AS author,
@@ -25,7 +27,7 @@ exports.all = async (req, res) => {
             SELECT 
                 c.id, 
                 c.rating,
-                c.content, 
+                CASE WHEN c.isDeleted THEN '[**** This review has been deleted by the admin ***]' ELSE c.content END AS content, 
                 c.parentId, 
                 ct.level + 1, 
                 CONCAT(u.first_name, ' ', u.last_name) AS author,
@@ -40,7 +42,6 @@ exports.all = async (req, res) => {
             type: QueryTypes.SELECT,
             replacements: { productId: req.body.product_id },
         });
-        // format reviews into nested structure
         result = buildNestedReviews(reviews);
         res.json({ result: result });
     } catch (error) {
@@ -48,6 +49,7 @@ exports.all = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 exports.add = async (req, res) => {
     try {
@@ -98,12 +100,15 @@ exports.delete = async (req, res) => {
             return res.status(404).json({ error: 'Review not found' });
         }
 
-        await review.destroy();
-        res.json({ message: 'Review deleted successfully' });
+        review.isDeleted = true;
+        await review.save();
+
+        res.json({ message: 'Review marked as deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
 // Get average rating of a product
 exports.getTotalRating = async (req, res) => {
     try {
