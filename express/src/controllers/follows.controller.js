@@ -1,6 +1,6 @@
 const db = require("../database");
 
-// Select all users from the database.
+// get all follows by user_id 
 exports.all = async (req, res) => {
     try {
         console.log(JSON.stringify(req.body));

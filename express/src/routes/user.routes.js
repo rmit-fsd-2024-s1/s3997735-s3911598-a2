@@ -5,18 +5,12 @@ module.exports = (express, app) => {
     // get all user
     router.get("/", controller.all);
 
-    // get single user
-    router.get("/select/:id", controller.one);
-
-    // user signin
+    // user login
     router.post("/login", controller.login);  
 
     // create new user
     router.post("/signup", controller.create);
 
-    // update user
-    router.put("/:id", controller.update);
-    
     
     //get current user details
     router.post("/profile/get", controller.getUser);

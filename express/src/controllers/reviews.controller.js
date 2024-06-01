@@ -7,6 +7,7 @@ const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
 exports.all = async (req, res) => {
     try {
         console.log(JSON.stringify(req.body));
+        // use raw query to get the nested comments and join users table to get the author name
         const reviews = await db.sequelize.query(`WITH RECURSIVE comment_tree AS (
             SELECT 
                 r.id, 
@@ -40,6 +41,7 @@ exports.all = async (req, res) => {
             type: QueryTypes.SELECT,
             replacements: { productId: req.body.product_id },
         });
+        // format reviews into nested structure
         result = buildNestedReviews(reviews);
         res.json({ result: result });
     } catch (error) {
@@ -102,7 +104,7 @@ exports.delete = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
-
+// Get average rating of a product
 exports.getTotalRating = async (req, res) => {
     try {
         const totalRating = await db.sequelize.query(`SELECT AVG(rating) as totalRating FROM reviews WHERE productId = :productId and rating != 0` , {

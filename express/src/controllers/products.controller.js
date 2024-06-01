@@ -1,7 +1,7 @@
 const db = require("../database");
 const argon2 = require("argon2");
 
-// Select all users from the database.
+// get all products by category
 exports.all = async (req, res) => {
   try {
     console.log(JSON.stringify(req.body));
@@ -19,7 +19,7 @@ exports.all = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
+// get one product by id for product detail page
 exports.one = async (req, res) => {
   try {
     const product = await db.products.findByPk(req.body.product_id);

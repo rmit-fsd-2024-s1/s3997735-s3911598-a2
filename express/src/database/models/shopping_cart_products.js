@@ -1,3 +1,4 @@
+// Association table between shopping_cart and products
 module.exports = (sequelize, DataTypes) =>
   sequelize.define("shopping_cart_products", {
     id: {

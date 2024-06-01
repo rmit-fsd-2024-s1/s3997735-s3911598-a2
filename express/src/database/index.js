@@ -5,15 +5,12 @@ const db = {
     Op: Sequelize.Op,
 };
 
-
-
 // Create Sequelize.
 db.sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
     host: config.HOST,
     dialect: config.DIALECT,
 });
 
-// Include models.
 db.user = require("./models/user.js")(db.sequelize, DataTypes);
 db.products = require("./models/products.js")(db.sequelize, DataTypes);
 db.shopping_cart = require("./models/shopping_cart.js")(
@@ -28,26 +25,26 @@ db.reviews = require("./models/reviews.js")(db.sequelize, DataTypes);
 db.follows = require("./models/follows.js")(db.sequelize, DataTypes);
 
 
-
+// Define associations.
+// A user only have one shopping cart.
 db.user.hasOne(db.shopping_cart);
 db.shopping_cart.belongsTo(db.user);
-
+// A shopping cart can have many products, and a product can be in many shopping carts.
 db.shopping_cart.belongsToMany(db.products, {
     through: db.shopping_cart_products,
 });
 db.products.belongsToMany(db.shopping_cart, {
     through: db.shopping_cart_products,
 });
-
+// A product can have many reviews, and a user can have many reviews.
 db.reviews.belongsTo(db.products);
 db.reviews.belongsTo(db.user);
 
-// Learn more about associations here: https://sequelize.org/master/manual/assocs.html
 
 // Include a sync option with seed data logic included.
 db.sync = async () => {
     // Sync schema.
-    await db.sequelize.sync({force: true});
+    await db.sequelize.sync();
 
     // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
     

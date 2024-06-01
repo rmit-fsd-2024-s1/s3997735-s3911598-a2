@@ -25,17 +25,6 @@ interface CartItemModel {
   quantity: number;
 }
 
-async function verifyUser(email:string, password:string) {
-  const response = await axios.get("localhost:4000/api/users/login", { params: { email, password } });
-  const user = response.data;
-
-  // NOTE: In this example the login is also persistent as it is stored in local storage.
-  if(user !== null)
-    // setUser(user);
-
-  return user;
-}
-
 function signup(name: string, email: string, password: string) {
   //use md5 to hash password
   const pwd = CryptoJs.MD5(password).toString();

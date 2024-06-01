@@ -12,16 +12,6 @@ exports.all = async (req, res) => {
     }
 };
 
-// Get a single user by ID from the database
-exports.one = async (req, res) => {
-    try {
-        const user = await db.user.findByPk(req.params.id);
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
 // Authenticate user by email and password
 exports.login = async (req, res) => {
     try {
@@ -65,29 +55,6 @@ exports.create = async (req, res) => {
     }
 };
 
-// Update user details by ID in the database
-exports.update = async (req, res) => {
-    try {
-        const { email, first_name, last_name, password } = req.body;
-        const user = await db.user.findByPk(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        // Update user fields
-        user.email = email || user.email;
-        user.first_name = first_name || user.first_name;
-        user.last_name = last_name || user.last_name;
-        if (password) {
-            user.password_hash = await argon2.hash(password, { type: argon2.argon2id });
-        }
-
-        await user.save();
-        res.json({ message: 'User updated successfully', user: { email: user.email, first_name: user.first_name, last_name: user.last_name } });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
 
 // Get current user profile by ID from the database
 exports.getUser = async (req, res) => {
@@ -124,7 +91,7 @@ exports.updateCurrentUser = async (req, res) => {
         res.status(500).json({ error: "An error occurred while updating user data" });
     }
 };
-
+// delete user by ID from the database
 exports.delete = async (req, res) => {
     try {
         console.log(req.query.id);
