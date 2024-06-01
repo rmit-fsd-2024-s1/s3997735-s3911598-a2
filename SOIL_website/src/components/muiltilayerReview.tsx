@@ -134,6 +134,22 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
             console.error('Error fetching products:', error);
         }
     }
+    const [updateWords, setUpdateWords] = useState(0);
+    const [replyWords, setReplyWords] = useState(0);
+    const updateWordsHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const words = event.target.value.trim().split(/\s+/).filter(Boolean).length;
+        if (words <= 100) {
+            setUpdateWords(words);
+            setUpdateContent(event.target.value);
+        } 
+    }
+    const replyWordsHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const words = event.target.value.trim().split(/\s+/).filter(Boolean).length;
+        if (words < 100) {
+            setReplyWords(words);
+            setReplyContent(event.target.value);
+        }
+    }
     return (
         <>
             <hr />
@@ -171,7 +187,8 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
                                     <PopoverArrow />
                                     <PopoverCloseButton />
                                     <PopoverBody>
-                                        <TextField inputProps={{ maxLength: 100 }} value={updateContent} onChange={e => setUpdateContent(e.target.value)} className='w-full' id="outlined-basic" label="input reviews" variant="outlined" size='small' />
+                                        <TextField inputProps={{ maxLength: 1000 }} value={updateContent} onChange={updateWordsHandler} className='w-full' id="outlined-basic" label="input comments" variant="outlined" size='small' />
+                                        <p>{updateWords} / 100 words</p>
                                         <div className='mt-2 w-full flex justify-start items-center gap-3'>
                                             <FormLabel >rating:</FormLabel>
 
@@ -229,7 +246,8 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
                                 <PopoverArrow />
                                 <PopoverCloseButton />
                                 <PopoverBody>
-                                    <TextField inputProps={{ maxLength: 100 }} value={replyContent} onChange={e => setReplyContent(e.target.value)} className='w-full' id="outlined-basic" label="input reviews" variant="outlined" size='small' />
+                                    <TextField inputProps={{ maxLength: 1000 }} value={replyContent} onChange={replyWordsHandler} className='w-full' id="outlined-basic" label="input comments" variant="outlined" size='small' />
+                                        <p>{replyWords} / 100 words</p>
                                     <div className='mt-2 w-full flex justify-start items-center gap-3'>
                                         <FormLabel >rating:</FormLabel>
 

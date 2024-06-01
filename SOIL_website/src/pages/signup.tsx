@@ -1,20 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useToast } from "@chakra-ui/react"; 
+import axios, { AxiosError } from "axios";
+import { useToast } from "@chakra-ui/react";
+import { User, setCurrentUser } from "../data/repository";
 
-interface SignupProps {
-    loginUser: (user: User) => void;
-}
-
-interface User {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-}
-
-const Signup: React.FC<SignupProps> = ({ loginUser }) => {
+const Signup = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const [fields, setFields] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
@@ -60,24 +50,33 @@ const Signup: React.FC<SignupProps> = ({ loginUser }) => {
         }
 
         try {
+
+
             const response = await axios.post<User>('http://localhost:4000/api/users/signup', {
                 first_name: firstName,
                 last_name: lastName,
                 email,
                 password
             });
+            
+            if (response.status === 200) {
+                const user = response.data;
+                setCurrentUser(user);
 
-            const user = response.data;
-            loginUser(user);
+                toast({
+                    title: 'Sign up successful!',
+                    status: 'success',
+                    duration: 2500,
+                });
 
-            toast({
-                title: 'Sign up successful!',
-                status: 'success',
-                duration: 2500,
-            });
-
-            navigate("/");
+                navigate("/");
+            }
         } catch (error) {
+            const err = error as AxiosError;
+            if (err.response?.status === 409) {
+                setErrorMessage("Email already exists. Please try again.");
+                return;
+            }
             setErrorMessage("An error occurred. Please try again.");
         }
     };
@@ -149,7 +148,7 @@ const Signup: React.FC<SignupProps> = ({ loginUser }) => {
                             />
                         </div>
                         <div className="form-group text-center">
-                            <input type="submit" className="btn btn-primary" value="Sign Up"/>
+                            <input type="submit" className="btn btn-primary" value="Sign Up" />
                             <button type="button" className="btn btn-secondary ml-12" onClick={handleCancel}>Cancel
                             </button>
                         </div>

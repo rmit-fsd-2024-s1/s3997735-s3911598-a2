@@ -1,3 +1,5 @@
+const { add } = require("../../controllers/follows.controller");
+
 module.exports = (sequelize, DataTypes) =>
     sequelize.define("user", {
             id: {
@@ -31,7 +33,11 @@ module.exports = (sequelize, DataTypes) =>
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
                 allowNull: false
-            }
+            },
+            address: {
+                type: DataTypes.STRING(255),
+                allowNull: true
+            },
         }, {
             // Add the timestamp attributes (updatedAt, createdAt).
             timestamps: true

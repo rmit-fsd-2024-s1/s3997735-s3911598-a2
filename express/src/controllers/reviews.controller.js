@@ -62,7 +62,11 @@ exports.add = async (req, res) => {
         
         
         //pubsub to notify the socket....
-        await pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+        try {
+            await pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
+        } catch (pubsubError) {
+            console.error("Error publishing reviewAdded event:", pubsubError);
+        }
     } catch (error) {
         res.status(500).json({ error: JSON.stringify(error) });
     }
@@ -101,7 +105,7 @@ exports.delete = async (req, res) => {
 
 exports.getTotalRating = async (req, res) => {
     try {
-        const totalRating = await db.sequelize.query(`SELECT AVG(rating) as totalRating FROM reviews WHERE productId = :productId`, {
+        const totalRating = await db.sequelize.query(`SELECT AVG(rating) as totalRating FROM reviews WHERE productId = :productId and rating != 0` , {
             type: QueryTypes.SELECT,
             replacements: { productId: req.query.product_id },
         });

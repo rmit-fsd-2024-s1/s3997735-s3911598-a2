@@ -16,6 +16,7 @@ export default function Header() {
         const storageListener = () => {
             let user: User | null = getCurrentUser();
             navigate('/');
+            console.log("nav:",user)
             setUsername(user == null ? null : user.name);
             console.log('storage event');
         };

@@ -1,19 +1,11 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setCurrentUser } from "../data/repository";
+import { User } from "../data/repository";
 
-interface LoginProps {
-    loginUser: (user: User) => void;
-}
 
-interface User {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-}
-
-export default function Login(props: LoginProps) {
+export default function Login() {
     const navigate = useNavigate();
     const [fields, setFields] = useState({ email: "", password: "" });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -32,7 +24,7 @@ export default function Login(props: LoginProps) {
                 password: fields.password
             });
 
-            const user = response.data;
+            const user = response.data as User | null;
 
             if (user === null) {
                 // Login failed, reset password field to blank and set error message.
@@ -41,8 +33,7 @@ export default function Login(props: LoginProps) {
                 return;
             }
 
-            // Set user state.
-            props.loginUser(user);
+            setCurrentUser(user);
 
             // Navigate to the home page.
             navigate("/");

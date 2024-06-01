@@ -116,12 +116,16 @@ export default function Comment({ product_id }: CommentProps) {
     }
     const wordsHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         const words = event.target.value.trim().split(/\s+/).filter(Boolean).length;
-        if (words <= 100) {
+        if (words <= 100 || event.target.value.length <= 100) {
             setWords(words);
             setContent(event.target.value);
+        } else {
+            toast({
+                title: 'Words limited to 100',
+                status: 'error',
+                duration: 2000,
+            });
         }
-
-
     }
 
     return (

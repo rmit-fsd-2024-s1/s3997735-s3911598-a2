@@ -9,10 +9,12 @@ const CART_KEY = 'cartItems';
 interface User {
   id: number;
   name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
-  date: string;
-
+  createdAt: string;
+  address: string;
 }
 
 interface CartItemModel {
@@ -75,20 +77,21 @@ function login(email: string, password: string): User | null {
   return null;
 }
 
+function setCurrentUser(user: User) {
+  user.name = user.first_name + ' ' + user.last_name;
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  
+  window.dispatchEvent(new Event('myStorageEvent'));
+}
+
 function logout() {
   localStorage.removeItem(CURRENT_USER_KEY);
   window.dispatchEvent(new Event('myStorageEvent'));
 }
 
 function getCurrentUser(): User | null {
-  const username = localStorage.getItem(CURRENT_USER_KEY);
-  const storedUsers: string | null = localStorage.getItem(USERS_KEY);
-  if (storedUsers == null) {
-    return null;
-  }
-  const users = JSON.parse(storedUsers);
-  //find the user by username
-  const user = users.find((user: User) => user.name === username);
+  console.log(localStorage.getItem(CURRENT_USER_KEY));
+  const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
   if (user) {
     return user;
   }
@@ -206,6 +209,7 @@ export type { User, CartItemModel };
 
 export {
   signup, login, logout, getCurrentUser, deleteUser, UpdateUser, isLoggedIn,
-  addItem, removeItem, updateQuantity, clearCart, getTotalPrice, getCartItems, checkUserExists
+  addItem, removeItem, updateQuantity, clearCart, getTotalPrice, getCartItems, checkUserExists,
+  setCurrentUser
 };
 
