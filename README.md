@@ -61,6 +61,9 @@ and the display of review statistics.
  - Mutations include `deleteReview` and `flagReview` for deleting and flagging reviews.
  - Subscriptions include `reviewAdded` and `reviewFlagged` for real-time updates when reviews are added or flagged.
 
+- **Unit Test**:
+    The unit test part tests the business code of the core part, mainly to test the normal use of the corresponding table. The code of the core part is repeatedly written. If there is a service layer, the service layer can be called directly, and there is no need to repeat the code.
+
 #### Frontend
 
 - **React Components**:
