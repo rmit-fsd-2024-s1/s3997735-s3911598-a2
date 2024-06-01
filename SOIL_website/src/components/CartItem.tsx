@@ -1,5 +1,6 @@
 import React from 'react';
 import { Product } from '../models/Product';
+import { Category } from '@mui/icons-material';
 
 interface CartItemProps {
     item: {

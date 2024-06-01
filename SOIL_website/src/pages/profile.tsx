@@ -50,7 +50,7 @@ export default function Home() {
         e.preventDefault();
 
         // Check if the values have changed
-        if (first_name === user?.first_name && last_name === user?.last_name) {
+        if (first_name === user?.first_name && last_name === user?.last_name && address === user?.address) {
             toast({
                 title: 'No changes detected.',
                 description: "You did not change anything!",

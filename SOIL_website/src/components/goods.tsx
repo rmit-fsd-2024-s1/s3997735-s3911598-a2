@@ -87,10 +87,10 @@ const Goods = ({ category }: GoodsProps) => {
                 {
                     user_id: user?.id,
                     product_id: special.id,
-                    quantity: quantities[special.id]?quantities[special.id]:1,
+                    quantity: quantities[special.id] ? quantities[special.id] : 1,
                 }
             );
-            if (response.status === 400||response.status === 200) {
+            if (response.status === 400 || response.status === 200) {
                 toast({
                     title: 'Added to cart',
                     status: 'success',
@@ -114,17 +114,18 @@ const Goods = ({ category }: GoodsProps) => {
                         <div className="text-left">
                             <h3 className="text-lg font-bold">{special.name}</h3>
                             <p className="text-xl font-bold">${special.price.toFixed(2)} kg</p>
-                            <p className="text-sm text-gray-500">Save
-                                ${(special.originalPrice - special.price).toFixed(2)} kg</p>
-                            <p className="text-sm text-gray-600 mb-4">Offer
-                                valid {formatDate(special.validFrom)} - {formatDate(special.validTo)}</p>
+                            {special.category === 'special' && <>
+                                <p className="text-sm text-gray-500">Save
+                                    ${(special.originalPrice - special.price).toFixed(2)} kg</p>
+                                <p className="text-sm text-gray-600 mb-4">Offer
+                                    valid {formatDate(special.validFrom)} - {formatDate(special.validTo)}</p></>}
                             <div className="flex items-center">
                                 <div className="flex border rounded overflow-hidden mr-2">
                                     <button onClick={() => handleQuantityChange(special.id, -1)}
                                         className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         -
                                     </button>
-                                    <span className="px-3 py-1 bg-white text-gray-700">{quantities[special.id]?quantities[special.id]:1}</span>
+                                    <span className="px-3 py-1 bg-white text-gray-700">{quantities[special.id] ? quantities[special.id] : 1}</span>
                                     <button onClick={() => handleQuantityChange(special.id, 1)}
                                         className="px-3 py-1 bg-gray-200 text-gray-600 hover:bg-gray-300 focus:outline-none">
                                         +
@@ -136,7 +137,7 @@ const Goods = ({ category }: GoodsProps) => {
                                 >
                                     <FaCartPlus size={20} />
                                 </button>
-                                {user && <button onClick={() => {navigate(`/detail/${special.id}`);}} className='ml-auto'>
+                                {user && <button onClick={() => { navigate(`/detail/${special.id}`); }} className='ml-auto'>
                                     reviews
                                 </button>}
                             </div>
