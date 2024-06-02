@@ -94,7 +94,7 @@ It can indicate product popularity and user engagement.
 Reason: By categorizing reviews into short, medium, and long lengths, we can gain insights into the type of feedback users are providing.
 Longer reviews might indicate detailed feedback or strong opinions, whereas shorter reviews might indicate quick comments or less engagement.
 
-3.user EngagementData
+3. user EngagementData:
 Reason: By extracting user information from the review data and counting the number of reviews for each user, we can visually understand the activity level of each user in the system.
 
 
@@ -105,21 +105,13 @@ Reason: By extracting user information from the review data and counting the num
  - Review statistics are displayed using bar and pie charts.
 
 
-2. **Unit test**:
- - Use `cd express` and `npm test`.
- - And then can see the result of unit test.
-
-3. **Frontend**:
- - Use `npm start` to run the React application.
- - The admin dashboard can be accessed to manage reviews and view real-time updates and statistics.
-
 ## Example Usage
 
 const shouldFlagReview = (content) => {
-    const offensiveLanguage = ['trash', 'idiots'];
-    const irrelevantContent = ['The weather is great today'];
+    const offensiveLanguage = [/trash/i, /idiots/i];
+    const irrelevantContent = [/The weather is great today/i];
     const privacyViolations = [/address is \d+ \S+/i];
-    const obsceneOrViolentContent = ['fuck', 'smash it']
+    const obsceneOrViolentContent = [/fuck/i, /smash it/i];
 
 - When a user adds a review containing the word "trash/idiots/fuck/smash it/etc, it is automatically flagged.
 - The admin dashboard displays this review under flagged reviews.
@@ -142,6 +134,10 @@ User Frontend (SOIL_website):
 Navigate to the SOIL_website directory.
 Run npm install to install dependencies.
 Start the React application with npm start.
+
+## **Unit test**:
+ - Use `cd express` and `npm test`.
+ - And then can see the result of unit test.
 
 
 ### References 
