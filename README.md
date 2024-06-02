@@ -28,16 +28,18 @@ s3997735-s3911598-a2/
 │   │   │   ├── shopping_cart.controller.js
 │   │   │   └── user.controller.js
 │   │   ├── database/
-│   │   │   └── models/
+│   │   │   └── models.js
+│   │   │   └── config.js
+│   │   │   └── index.js
 │   │   ├── graphql/
 │   │   │   └── index.js
 │   │   ├── routes.js
 │   │   ├── server.js
 │   └── package.json
 ├── SOIL_website/              # User Frontend
-│   └── ... 
+│   └── ...
+├── FSP_A2_UML.png
 └── .README.md
-
 
 
 ## HD part
