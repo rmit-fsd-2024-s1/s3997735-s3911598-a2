@@ -27,6 +27,7 @@ const REVIEW_SUBSCRIPTION = gql`
       isDeleted
       flagged
     }
+    
   }
 `;
 
@@ -52,7 +53,6 @@ const ReviewModeration = () => {
     const [reviews, setReviews] = useState([]);
     const [reviewsFlag, setFlagReviews] = useState([]);
     // Load initial reviews data
-    // Load comments.
     useEffect(() => {
         async function loadReviews() {
             const currentComments = await getReview();
