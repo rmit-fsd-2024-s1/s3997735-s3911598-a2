@@ -97,10 +97,10 @@ const resolvers = {
 
         addProduct: async (_, { input }) => {
             try {
-                console.log("Adding product with input:", input); // 调试用
+                console.log("Adding product with input:", input); // testing
                 return await db.products.create(input);
             } catch (error) {
-                console.error("Error adding product:", error); // 调试用
+                console.error("Error adding product:", error); // testing
                 throw new Error('Error adding product');
             }
         },
@@ -143,24 +143,7 @@ const resolvers = {
             }
         },
 
-        // addReview: async (_, { content, userId, productId }) => {
-        //     try {
-        //         const user = await db.user.findByPk(userId);
-        //         if (!user) throw new Error('User not found');
-        //         const product = await db.products.findByPk(productId);
-        //         if (!product) throw new Error('Product not found');
-        //
-        //         const flagged = shouldFlagReview(content);
-        //         const review = await db.reviews.create({ content, userId, productId, flagged });
-        //         pubsub.publish(REVIEW_ADDED_TRIGGER, { reviewAdded: review });
-        //         if (flagged) {
-        //             pubsub.publish(REVIEW_FLAGGED_TRIGGER, { reviewFlagged: review });
-        //         }
-        //         return review;
-        //     } catch (error) {
-        //         throw new Error('Error adding review');
-        //     }
-        // },
+        
 
         flagReview: async (_, { id }) => {
             try {

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import client from "../apollo/client.js";
 import gql from "graphql-tag";
 import {getReview, deleteReview} from "../data/repository";
-// import { useQuery, useMutation, gql, useSubscription } from '@apollo/client';
 import {ListGroup, ListGroupItem, Button, Spinner, Container, Row, Col, Alert} from 'react-bootstrap';
 import {Bar, Pie} from 'react-chartjs-2';
 import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement} from 'chart.js';
@@ -10,9 +9,8 @@ import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScal
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
+
 // GraphQL queries, mutations, and subscriptions
-
-
 const REVIEW_SUBSCRIPTION = gql`
   subscription OnReviewAdded {
     reviewAdded {
@@ -52,11 +50,14 @@ const ReviewModeration = () => {
 
     const [reviews, setReviews] = useState([]);
     const [reviewsFlag, setFlagReviews] = useState([]);
+
+    
+
     // Load initial reviews data
     useEffect(() => {
         async function loadReviews() {
             const currentComments = await getReview();
-
+            //console.log(currentComments)
             setReviews(currentComments.slice(0, 3));
         }
 
@@ -166,6 +167,8 @@ const ReviewModeration = () => {
         return acc;
     }, {});
 
+    
+
     // Data for review statistics chart
     const reviewStatsData = {
         labels: Object.keys(reviewStats),
@@ -196,6 +199,25 @@ const ReviewModeration = () => {
         ],
     };
 
+    
+    // Prepare the data for user engagement chart
+    const reviewCountsByUser = reviews.reduce((acc, review) => {
+        acc[review.user.email] = (acc[review.user.email] || 0) + 1;
+        return acc;
+    }, {});
+
+    const userEngagementData = {
+        labels: Object.keys(reviewCountsByUser), 
+        datasets: [
+            {
+                label: 'Number of Reviews per User', // data
+                data: Object.values(reviewCountsByUser), 
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'], // background
+            },
+        ],
+    };
+
+
     return (
         <Container>
             <h2 className="mb-4">Review Moderation</h2>
@@ -222,8 +244,10 @@ const ReviewModeration = () => {
                 </Col>
                 <Col md={6}>
                     <h3>Review Statistics</h3>
-                    <Bar data={reviewStatsData} options={{ responsive: true }} />
-                    <Pie data={reviewLengthData} options={{ responsive: true }} />
+                    <Bar data={reviewStatsData} options={{responsive: true}}/>
+                    <Pie data={reviewLengthData} options={{responsive: true}}/>
+                    <h3>User Engagement</h3>
+                    <Bar data={userEngagementData} options={{responsive: true}}/>
                 </Col>
             </Row>
         </Container>

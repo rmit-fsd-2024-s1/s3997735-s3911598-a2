@@ -6,29 +6,30 @@ const {QueryTypes} = require("sequelize");
 const {pubsub, REVIEW_ADDED_TRIGGER, REVIEW_FLAGGED_TRIGGER} = require("../graphql");
 // const REVIEW_ADDED_TRIGGER = "REVIEW_ADDED";
 const shouldFlagReview = (content) => {
-    const offensiveLanguage = ['trash', 'idiots'];
-    const irrelevantContent = ['The weather is great today'];
+    const offensiveLanguage = [/trash/i, /idiots/i];
+    const irrelevantContent = [/The weather is great today/i];
     const privacyViolations = [/address is \d+ \S+/i];
-    const obsceneOrViolentContent = ['fuck', 'smash it'];
+    const obsceneOrViolentContent = [/fuck/i, /smash it/i];
 
-    for (let word of offensiveLanguage) {
-        if (content.includes(word)) return true;
+    for (let pattern of offensiveLanguage) {
+        if (pattern.test(content)) return true;
     }
 
-    for (let word of irrelevantContent) {
-        if (content.includes(word)) return true;
+    for (let pattern of irrelevantContent) {
+        if (pattern.test(content)) return true;
     }
 
     for (let pattern of privacyViolations) {
         if (pattern.test(content)) return true;
     }
 
-    for (let word of obsceneOrViolentContent) {
-        if (content.includes(word)) return true;
+    for (let pattern of obsceneOrViolentContent) {
+        if (pattern.test(content)) return true;
     }
 
     return false;
 };
+
 
 
 exports.all = async (req, res) => {
@@ -83,7 +84,7 @@ exports.all = async (req, res) => {
 
 exports.add = async (req, res) => {
     try {
-//--------implement flagreview --- test for lea
+//--------implement flag review ---
         const flag = shouldFlagReview(req.body.content);
         const review = await db.reviews.create({
             userId: req.body.user_id,
@@ -153,8 +154,9 @@ exports.delete = async (req, res) => {
             return res.status(404).json({error: 'Review not found'});
         }
 
-        review.isDeleted = true;
-        await review.save();
+        //review.isDeleted = true;
+       // await review.save();
+        await review.destroy();
 
         res.json({message: 'Review marked as deleted successfully'});
     } catch (error) {
