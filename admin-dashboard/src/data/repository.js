@@ -6,7 +6,7 @@ const GRAPH_QL_URL = "http://localhost:4000/graphql";
 // --- reviews -----------------------------------------------------------------------------------
 async function getReview() {
     const query = gql`
-    query Reviews {
+    query Reviews { 
     reviews {
       id
       content

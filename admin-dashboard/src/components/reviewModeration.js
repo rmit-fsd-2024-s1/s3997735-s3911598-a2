@@ -25,7 +25,7 @@ const REVIEW_SUBSCRIPTION = gql`
       isDeleted
       flagged
     }
-    
+
   }
 `;
 
@@ -51,7 +51,7 @@ const ReviewModeration = () => {
     const [reviews, setReviews] = useState([]);
     const [reviewsFlag, setFlagReviews] = useState([]);
 
-    
+
 
     // Load initial reviews data
     useEffect(() => {
@@ -59,6 +59,7 @@ const ReviewModeration = () => {
             const currentComments = await getReview();
             //console.log(currentComments)
             setReviews(currentComments.slice(0, 3));
+            setFlagReviews(currentComments.filter(review => review.flagged));
         }
 
         loadReviews();
@@ -67,7 +68,7 @@ const ReviewModeration = () => {
 
     // Setup subscription.
     useEffect(() => {
-        // Subscripe to the GraphQL comment_added subscription.
+        // Subscript to the GraphQL comment_added subscription.
         const subscription = client.subscribe({
             query: gql`
        subscription OnReviewAdded {
@@ -80,26 +81,24 @@ const ReviewModeration = () => {
       product {
         name
       }
-     
       flagged
     }
   }`
         }).subscribe({
             next: (payload) => {
-                console.log(payload.data);
+                //console.log(payload.data);
                 const newReview = payload.data.reviewAdded;
+                setReviews(prevReviews => [newReview, ...prevReviews].slice(0, 3));
 
-                setReviews(prevReviews => {
-                    const review = [newReview, ...prevReviews];
-                    return review.slice(0, 3);
-                });
-
+                // setReviews(prevReviews => {
+                //     const review = [newReview, ...prevReviews];
+                //     return review.slice(0, 3);
 
             },
             error: (error) => {
-
-
+                console.error("Subscription error:", error);
             }
+            
         });
 
         // Unsubscripe from the subscription when the effect unmounts.
@@ -108,6 +107,7 @@ const ReviewModeration = () => {
         };
     }, []);
 
+    // Setup subscription for review flagged
     useEffect(() => {
         const flaggedSubscription = client.subscribe({
             query: gql`
@@ -121,7 +121,7 @@ const ReviewModeration = () => {
       product {
         name
       }
-    
+
       flagged
     }
   }
@@ -167,7 +167,7 @@ const ReviewModeration = () => {
         return acc;
     }, {});
 
-    
+
 
     // Data for review statistics chart
     const reviewStatsData = {
@@ -199,7 +199,7 @@ const ReviewModeration = () => {
         ],
     };
 
-    
+
     // Prepare the data for user engagement chart
     const reviewCountsByUser = reviews.reduce((acc, review) => {
         acc[review.user.email] = (acc[review.user.email] || 0) + 1;
@@ -255,3 +255,4 @@ const ReviewModeration = () => {
 };
 
 export default ReviewModeration;
+
