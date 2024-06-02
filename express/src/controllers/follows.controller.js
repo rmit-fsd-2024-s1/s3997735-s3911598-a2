@@ -4,15 +4,16 @@ const db = require("../database");
 exports.all = async (req, res) => {
     try {
         console.log(JSON.stringify(req.body));
-    const follows = await db.follows.findAll(
+    const result = await db.follows.findAll(
         {
             where: {
                 userId: req.body.user_id
             }
         }
     );
-    res.json(follows);
+    res.json(result);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

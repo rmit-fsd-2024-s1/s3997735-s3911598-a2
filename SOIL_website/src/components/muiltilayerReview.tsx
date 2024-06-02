@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { Review, Reply, CommentProps , ReviewProps} from './reviews';
 
 export default function MuiltilayerReview ({ follows, review, sendReview }: ReviewProps) {
+    console.log(follows);
     const user: User | null = getCurrentUser();
     const toast = useToast();
     const navigate = useNavigate();
@@ -28,10 +29,11 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
     if (user && user.id === Number(userId)) {
         setIsDisabled(true);
     }
-    if (user && follows.includes(user.id.toString())) {
+    if (user && follows.includes(review.userId)) {
+        console.log('followed',follows);
         setIsFollowed(true);
     }
-    }, []);
+    }, [follows]);
     const followHandler = async () => {
         
         try {
@@ -53,6 +55,7 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
                     status: 'success',
                     duration: 2000,
                 });
+                navigate(0);
                 return;
             }
             const result = await axios.put("http://localhost:4000/api/follows/add", {
@@ -77,6 +80,7 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
         } catch (error) {
             console.error('Error fetching products:', error);
         }
+        navigate(0);
     }
     const replyHandler = () => {
         sendReview(id, replyRateing, replyContent);

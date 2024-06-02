@@ -2,12 +2,13 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setCurrentUser, User } from "../data/repository";
+import { useToast } from "@chakra-ui/react";
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
     const [fields, setFields] = useState({ email: "", password: "" });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+    const toast = useToast();
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setFields({ ...fields, [event.target.name]: event.target.value });
     };
@@ -31,6 +32,12 @@ const Login: React.FC = () => {
 
             setCurrentUser(user);
             navigate("/");
+            toast({
+                title: "Login successful, welcome back!",
+                status: "success",
+                duration: 2500,
+                isClosable: true,
+            })
         } catch (error: any) {
             if (error.response && error.response.status === 403) {
                 setErrorMessage("You have been blocked by the admin.");

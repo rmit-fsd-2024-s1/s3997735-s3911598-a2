@@ -1,5 +1,3 @@
-const { add } = require("../../controllers/follows.controller");
-
 module.exports = (sequelize, DataTypes) =>
     sequelize.define("user", {
             id: {

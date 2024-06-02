@@ -8,6 +8,7 @@ import { useShoppingCart } from '../hooks/useShoppingCart';
 import axios from "axios";
 import { data } from 'autoprefixer';
 import { Category } from '@mui/icons-material';
+import StarRatings from 'react-star-ratings';
 
 
 type Special = {
@@ -19,6 +20,7 @@ type Special = {
     imageUrl: string;
     validFrom: string;
     validTo: string;
+    rating: string;
 };
 
 export type { Special };
@@ -38,7 +40,21 @@ const Goods = ({ category }: GoodsProps) => {
             const result = await axios.post("http://localhost:4000/api/products", {
                 category: category
             });
-            setSpecials((result.data) as Special[]);
+            let data = result.data as Special[];
+            const promises = data.map(async (item) => {
+                try {
+                    const rating = await getRatings(item.id);
+                    item.rating = rating;
+                } catch (error) {
+                    console.error(error);
+                    item.rating = '0';
+                }
+            });
+    
+            // Wait for all promises to resolve
+            await Promise.all(promises);
+    
+            setSpecials(data);
         } catch (e) {
             console.error(e);
         }
@@ -100,8 +116,22 @@ const Goods = ({ category }: GoodsProps) => {
         } catch (error) {
             console.error('Error fetching cart items:', error);
         }
-        navigate('/shopping-cart');
     };
+
+    const getRatings = async (id: number) => {
+        try {
+            const result = await axios.get("http://localhost:4000/api/reviews/getTotalRating", {
+                params: { product_id: id }
+            });
+            if (result.data[0].totalRating === null) {
+                return '0';
+            }
+            return result.data[0].totalRating as string;
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            return '0';
+        }
+    }
 
     return (
         <div className="specials-container mx-auto mt-4 p-4">
@@ -137,9 +167,14 @@ const Goods = ({ category }: GoodsProps) => {
                                 >
                                     <FaCartPlus size={20} />
                                 </button>
-                                {user && <button onClick={() => { navigate(`/detail/${special.id}`); }} className='ml-auto'>
-                                    reviews
-                                </button>}
+                                <button onClick={() => { navigate(`/detail/${special.id}`); }} className='ml-auto'>
+                                    <StarRatings
+                                        rating={special.rating ? parseFloat(special.rating) : 0}
+                                        starDimension="10px"
+                                        starSpacing="3px"
+                                    />
+                                </button>
+
                             </div>
                         </div>
                     </div>

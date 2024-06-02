@@ -61,12 +61,15 @@ export default function Comment({ product_id }: CommentProps) {
             console.error('Error fetching products:', error);
         }
     }
-    let follows: string[] = [];
+    const [follows, setFollows] = useState<string[]>([]);
     const checkFollow = async () => {
         try {
             const result = await axios.post("http://localhost:4000/api/follows/", {
                 user_id: user?.id
             });
+            if (result.status === 404) {
+                return;
+            }
             if (result.status !== 200) {
                 toast({
                     title: 'Check follow failed',
@@ -75,7 +78,17 @@ export default function Comment({ product_id }: CommentProps) {
                 });
                 return;
             }
-            follows = result.data;
+            let followedUsers: string[] = [];
+            if (Array.isArray(result.data)) {
+                result.data.forEach((follow: any) => {
+                    if (follow && follow.followedUserId) {
+                        followedUsers.push(follow.followedUserId);
+                    }
+                });
+            } else {
+                console.error("Result data is not an array");
+            }
+            setFollows(followedUsers);
         } catch (error) {
             console.error('Error fetching products:', error);
         }

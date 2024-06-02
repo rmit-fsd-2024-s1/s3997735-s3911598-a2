@@ -79,12 +79,11 @@ exports.getUser = async (req, res) => {
 // Update current user profile by ID in the database
 exports.updateCurrentUser = async (req, res) => {
     try {
-        const { first_name, last_name, address } = req.body;
+        const { first_name, last_name } = req.body;
         const user = await db.user.findByPk(req.body.id);
         if (user) {
             user.first_name = first_name || user.first_name;
             user.last_name = last_name || user.last_name;
-            user.address = address || user.address;
             await user.save();
             res.json(user);
         } else {

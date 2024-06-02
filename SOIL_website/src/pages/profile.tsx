@@ -29,7 +29,6 @@ export default function Home() {
     const [edit, setEdit] = useState<boolean>(false);
     const [first_name, setFirst_name] = useState<string>(user?.first_name || '');
     const [last_name, setLast_name] = useState<string>(user?.last_name || '');
-    const [address, setAddress] = useState<string>(user?.address || '');
     const { isOpen, onToggle, onClose } = useDisclosure()
     const toast = useToast()
     const getUserProfile = async () => {
@@ -50,7 +49,7 @@ export default function Home() {
         e.preventDefault();
 
         // Check if the values have changed
-        if (first_name === user?.first_name && last_name === user?.last_name && address === user?.address) {
+        if (first_name === user?.first_name && last_name === user?.last_name ) {
             toast({
                 title: 'No changes detected.',
                 description: "You did not change anything!",
@@ -66,8 +65,8 @@ export default function Home() {
             const res = await axios.post("http://localhost:4000/api/users/profile/update", {
                 id: user?.id,
                 first_name,
-                last_name,
-                address
+                last_name
+                
             });
             if (res.data) {
                 setCurrentUser(res.data);
@@ -114,10 +113,6 @@ export default function Home() {
                     <FormLabel>Last name</FormLabel>
                     <Input type='text' value={last_name} onChange={e => setLast_name(e.target.value)} />
                 </FormControl>
-                <FormControl>
-                    <FormLabel>Address</FormLabel>
-                    <Input type='text' value={address} onChange={e => setAddress(e.target.value)} />
-                </FormControl>
                 <div className='flex items-center gap-4'>
                     <Button onClick={e => setEdit(false)}>Cancel</Button>
                     <Button type='submit' onClick={e => { handleUpdate(e) }} >Update</Button>
@@ -125,7 +120,6 @@ export default function Home() {
             </> : <>
                 <h1>first name: {user?.first_name} </h1>
                 <h1>last name: {user?.last_name} </h1>
-                <h1>address: {user?.address?user.address:'Not filled in yet'} </h1>
                 <h1>email: {user?.email}</h1>
                 <h1>join date: {user?.createdAt ? user.createdAt : 'Unavailable'}</h1>
                 <div className="flex gap-3">

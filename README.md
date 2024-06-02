@@ -105,6 +105,13 @@ Reason: By extracting user information from the review data and counting the num
  - Review statistics are displayed using bar and pie charts.
 
 
+2. **Unit test**:
+ - Use `cd express` and `npm test`.
+ - And then can see the result of unit test.
+
+3. **Frontend**:
+ - Use `npm start` to run the React application.
+ - The admin dashboard can be accessed to manage reviews and view real-time updates and statistics.
 
 ## Example Usage
 

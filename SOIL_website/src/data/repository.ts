@@ -14,7 +14,6 @@ interface User {
   email: string;
   password: string;
   createdAt: string;
-  address: string;
 }
 
 interface CartItemModel {
@@ -79,7 +78,6 @@ function logout() {
 }
 
 function getCurrentUser(): User | null {
-  console.log(localStorage.getItem(CURRENT_USER_KEY));
   const user = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
   if (user) {
     return user;
