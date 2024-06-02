@@ -94,6 +94,9 @@ It can indicate product popularity and user engagement.
 Reason: By categorizing reviews into short, medium, and long lengths, we can gain insights into the type of feedback users are providing.
 Longer reviews might indicate detailed feedback or strong opinions, whereas shorter reviews might indicate quick comments or less engagement.
 
+3.user EngagementData
+Reason: By extracting user information from the review data and counting the number of reviews for each user, we can visually understand the activity level of each user in the system.
+
 
 ## Implementation Details
 - Frontend - React Components:
