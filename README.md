@@ -55,17 +55,14 @@ It uses GraphQL for data operations and React for the user interface.
 -Delete a product
 
 ### Usage
-1. **View Products**
-    - Navigate to the main page to view the list of products.
-
-2. **Add Product**
+1. **Add Product**
     - Fill in the product details in the form and click "Add Product".
     - **Note:** After adding a product, you need to refresh the page to see the new product in the list.
 
-3. **Update Product**
+2. **Update Product**
     - Click the "Update" button next to the product you want to update, fill in the new details, and click "Update Product".
 
-4. **Delete Product**
+3. **Delete Product**
     - Click the "Delete" button next to the product you want to delete. A success message will be displayed upon successful deletion.
 
 
@@ -97,16 +94,12 @@ Reason: By categorizing reviews into short, medium, and long lengths, we can gai
 Longer reviews might indicate detailed feedback or strong opinions, whereas shorter reviews might indicate quick comments or less engagement.
 
 3. user EngagementData:
-Reason: By extracting user information from the review data and counting the number of reviews for each user, we can visually understand the activity level of each user in the system.
+Reason: By extracting user information from the review data and counting the number of reviews for each user,
+we can visually understand the activity level of each user in the system.
 
 
-## Implementation Details
-- Frontend - React Components:
- - The `ReviewModeration` component uses Apollo Client to query, mutate, and subscribe to review data.
- - Reviews are displayed in lists, with flagged reviews highlighted for easy identification by the admin.
- - Review statistics are displayed using bar and pie charts.
 
-
+## **Flagging Reviews**:
 ## Example Usage
 
 const shouldFlagReview = (content) => {
@@ -143,6 +136,7 @@ Start the React application with npm start.
 
 
 ### References 
+
 week7 Lectorial code/practical code
 week8 Lectorial code
 week11 practical code
