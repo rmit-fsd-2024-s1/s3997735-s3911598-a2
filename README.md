@@ -117,18 +117,18 @@ const shouldFlagReview = (content) => {
 
 
 ## How to Run
-Backend:
 
+Backend:
 Navigate to the express directory.
 Run npm install to install dependencies.
 Start the server with npm start.
-Admin Dashboard:
 
+Admin Dashboard:
 Navigate to the admin-dashboard directory.
 Run npm install to install dependencies.
 Start the React application with npm start.
-User Frontend (SOIL_website):
 
+User Frontend (SOIL_website):
 Navigate to the SOIL_website directory.
 Run npm install to install dependencies.
 Start the React application with npm start.
