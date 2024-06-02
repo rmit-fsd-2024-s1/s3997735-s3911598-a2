@@ -3,8 +3,40 @@
 ### githubURL: https://github.com/rmit-fsd-2024-s1/s3997735-s3911598-a2
 
 ## Project Structure
-
-
+s3997735-s3911598-a2/
+├── .git/
+├── admin-dashboard/           # Admin Dashboard Frontend
+│   ├── src/
+│   │   ├── apollo/
+│   │   │   └── client.js
+│   │   ├── components/
+│   │   │   ├── productDetail.js
+│   │   │   ├── productManagement.js
+│   │   │   ├── reviewModeration.js
+│   │   │   └── userManagement.js
+│   │   ├── data/
+│   │   │   └── repository.js
+│   │   ├── App.js
+│   │   ├── index.js
+│   └── package.json
+├── express/                   # Backend
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── follows.controller.js
+│   │   │   ├── products.controller.js
+│   │   │   ├── reviews.controller.js
+│   │   │   ├── shopping_cart.controller.js
+│   │   │   └── user.controller.js
+│   │   ├── database/
+│   │   │   └── models/
+│   │   ├── graphql/
+│   │   │   └── index.js
+│   │   ├── routes.js
+│   │   ├── server.js
+│   └── package.json
+├── SOIL_website/              # User Frontend
+│   └── ... 
+└── .README.md
 
 
 
@@ -35,7 +67,6 @@ It uses GraphQL for data operations and React for the user interface.
     - Click the "Delete" button next to the product you want to delete. A success message will be displayed upon successful deletion.
 
 
-
 ## Review Moderation 
 
 ### Overview
@@ -51,62 +82,62 @@ and the display of review statistics.
 3. **Flagging Reviews**: Reviews containing certain keywords are automatically flagged for moderation.
 4. **Review Statistics**: The dashboard displays statistics related to the number of reviews per product.
 
-### Implementation Details
 
-#### Backend
+## Metrics Explanation
+We have chosen the following metrics to enhance understanding and provide meaningful insights into the review moderation process:
 
-- **GraphQL Schema and Resolvers**:
- - The `Review` type includes fields for `isDeleted` and `flagged`.
- - Queries include `reviews` and `flaggedReviews` to fetch all reviews and flagged reviews, respectively.
- - Mutations include `deleteReview` and `flagReview` for deleting and flagging reviews.
- - Subscriptions include `reviewAdded` and `reviewFlagged` for real-time updates when reviews are added or flagged.
+1. Number of Reviews per Product:
+Reason: This metric helps administrators understand which products are receiving the most feedback from users.
+It can indicate product popularity and user engagement.
 
-- **Unit Test**:
-    The unit test part tests the business code of the core part, mainly to test the normal use of the corresponding table. The code of the core part is repeatedly written. If there is a service layer, the service layer can be called directly, and there is no need to repeat the code.
+2. Review Length Distribution:
+Reason: By categorizing reviews into short, medium, and long lengths, we can gain insights into the type of feedback users are providing.
+Longer reviews might indicate detailed feedback or strong opinions, whereas shorter reviews might indicate quick comments or less engagement.
 
-#### Frontend
 
-- **React Components**:
+## Implementation Details
+- Frontend - React Components:
  - The `ReviewModeration` component uses Apollo Client to query, mutate, and subscribe to review data.
  - Reviews are displayed in lists, with flagged reviews highlighted for easy identification by the admin.
  - Review statistics are displayed using bar and pie charts.
 
-### How to Run
 
-1. **Backend**:
- - Start the GraphQL server with the appropriate configurations.
- - Ensure the database models and associations are correctly set up.
-
-2. **Frontend**:
- - Use `npm start` to run the React application.
- - The admin dashboard can be accessed to manage reviews and view real-time updates and statistics.
 
 ## Example Usage
 
-- When a user adds a review containing the word "inappropriate", it is automatically flagged.
+const shouldFlagReview = (content) => {
+    const offensiveLanguage = ['trash', 'idiots'];
+    const irrelevantContent = ['The weather is great today'];
+    const privacyViolations = [/address is \d+ \S+/i];
+    const obsceneOrViolentContent = ['fuck', 'smash it']
+
+- When a user adds a review containing the word "trash/idiots/fuck/smash it/etc, it is automatically flagged.
 - The admin dashboard displays this review under flagged reviews.
 - The admin can then delete this review, and it will show a placeholder message in the user interface.
 
-## Conclusion
 
-This feature enhances the ability of administrators to manage user-generated content effectively, 
-ensuring that inappropriate reviews are promptly flagged and addressed.
+## How to Run
+Backend:
 
+Navigate to the express directory.
+Run npm install to install dependencies.
+Start the server with npm start.
+Admin Dashboard:
 
+Navigate to the admin-dashboard directory.
+Run npm install to install dependencies.
+Start the React application with npm start.
+User Frontend (SOIL_website):
 
-
-## Installation
-
-1. Clone the repository.
-2. Install dependencies using `npm install`.
-3. Run the application using `npm start`.
-
-
+Navigate to the SOIL_website directory.
+Run npm install to install dependencies.
+Start the React application with npm start.
 
 
 ### References 
-week7
-week8
+week7 Lectorial code/practical code
+week8 Lectorial code
+week11 practical code
 
 
 
