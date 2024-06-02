@@ -64,11 +64,10 @@ const Signup = () => {
                 setCurrentUser(user);
 
                 toast({
-                    title: 'Sign up successful!',
+                    title: 'You have been signed in. Welcome!',
                     status: 'success',
                     duration: 2500,
                 });
-
                 navigate("/");
             }
         } catch (error) {
