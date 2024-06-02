@@ -46,9 +46,6 @@ db.sync = async () => {
     // Sync schema.
     await db.sequelize.sync();
 
-    // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
-    
-
     await seedData();
 };
 
@@ -199,7 +196,6 @@ async function seedData() {
         validFrom: new Date().toDateString(),
         validTo: new Date().toDateString(),
     });
-
     await db.shopping_cart.create({
         userId: 1,
     });

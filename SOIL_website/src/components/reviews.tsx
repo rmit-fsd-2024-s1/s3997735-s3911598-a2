@@ -63,6 +63,9 @@ export default function Comment({ product_id }: CommentProps) {
     }
     const [follows, setFollows] = useState<string[]>([]);
     const checkFollow = async () => {
+        if (!user) {
+            return;
+        }
         try {
             const result = await axios.post("http://localhost:4000/api/follows/", {
                 user_id: user?.id
@@ -99,7 +102,14 @@ export default function Comment({ product_id }: CommentProps) {
     }, []);
 
     const sendReview = async (parent_id: string | null, rating: number, content: string) => {
-
+        if (!user) {
+            toast({
+                title: 'Please login first',
+                status: 'error',
+                duration: 2000,
+            });
+            return;
+        }
         // send review to the backend
         try {
             const result = await axios.put("http://localhost:4000/api/reviews/add", {

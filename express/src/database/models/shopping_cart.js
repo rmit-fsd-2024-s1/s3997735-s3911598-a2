@@ -7,9 +7,7 @@ module.exports = (sequelize, DataTypes) =>
     }
   }, {
     // Don't add the timestamp attributes (updatedAt, createdAt).
-    timestamps: false
-  }, {
-    tableName: 'shopping_cart' 
-  }, {
+    timestamps: false,
+    tableName: 'shopping_cart' ,
     freezeTableName: true, 
   });

@@ -5,9 +5,11 @@ const { QueryTypes } = require("sequelize");
 
 
 function build(opts = {}) {
-    
-    
+
+
     const app = fastify(opts);
+
+
 
     app.post('/reviews', async function (request, reply) {
         // call the main function of reviews to test database connection and database attributes
@@ -47,18 +49,23 @@ function build(opts = {}) {
         return { data: reviews };
     });
 
-    app.put('/shoppingCart/add', async function (request, reply) {
-        try {
-            const result = await db.shopping_cart.create({
-                userId: request.body.user_id
-            });
-            // it maybe exist same shopping cart with same user_id
-            // so we just need to catch the error and return the success
-            return { success: true };
-        } catch (error) {
-            console.log(error);
+    app.put('/shoppingCartRecord/update', async function (request, reply) {
+
+        // find the shopping cart product by id from test data
+        const shopping_cart_product = await db.shopping_cart_products.findOne({
+            where: {
+                id: request.body.id
+            }
+        });
+        if (shopping_cart_product === null)
             return { success: false };
+        else {
+            shopping_cart_product.quantity = request.body.quantity;
+            await shopping_cart_product.save();
+            // if the shopping cart product is updated successfully, return success
+            return { success: true };
         }
+
     });
 
     app.get('/shoppingCart', async function (request, reply) {
@@ -72,23 +79,24 @@ function build(opts = {}) {
                 },
             },
         );
-        // we will get the result using the same user id
+        // we will get the result because we have add one test record in the database
         return result;
     });
 
-    app.delete('/shoppingCart/deleteAll', async function (request, reply) {
-        try {
-            await db.shopping_cart.destroy({
-                where: {
-                    userId: request.query.user_id
-                }
-            })
-            // if the shopping cart is deleted successfully, return success
-            return { success: true };
-        } catch (error) {
-            console.log(error);
+    app.delete('/shoppingCartRecord/delete', async function (request, reply) {
+
+        //find the shopping cart product by id from test data
+        const shopping_cart_product = await db.shopping_cart_products.findByPk(request.query.id);
+
+        if (shopping_cart_product === null)
             return { success: false };
+        else {
+            await shopping_cart_product.destroy();
+
         }
+        // if the shopping cart record is deleted successfully, return success
+        return { success: true };
+
     })
 
     return app;

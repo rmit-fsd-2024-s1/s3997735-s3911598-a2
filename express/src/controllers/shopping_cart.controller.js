@@ -31,8 +31,6 @@ exports.all = async (req, res) => {
 
 exports.add = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.body.user_id);
     let shopping_cart = await db.shopping_cart.findOne({
       where: {
         userId: req.body.user_id
@@ -69,7 +67,6 @@ exports.add = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    console.log("delete", req.query);
     const shopping_cart_product = await db.shopping_cart_products.findByPk(req.query.id);
     if (shopping_cart_product === null)
       res.status(404).json({ error: 'Shopping cart product not found' });

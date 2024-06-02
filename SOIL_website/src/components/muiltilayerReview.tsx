@@ -35,7 +35,14 @@ export default function MuiltilayerReview ({ follows, review, sendReview }: Revi
     }
     }, [follows]);
     const followHandler = async () => {
-        
+        if (!user) {
+            toast({
+                title: 'Please log in first',
+                status: 'error',
+                duration: 2000,
+            });
+            return;
+        }
         try {
             if (isFollowed) {
                 const result = await axios.delete("http://localhost:4000/api/follows/delete", {
